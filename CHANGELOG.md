@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.8
+
+- Kept the phone panel at the normal readable UI scale when the overworld is
+  using survey zoom, instead of shrinking the menu along with the map.
+- Preserved Dynamic UI's top-right docking and the map's selected zoom level,
+  including portrait setups that reserve the lower screen for a Pocket Taco
+  or another controller overlay.
+- Added a regression case and an adjustable survey-zoom screenshot preview.
+
 ## 0.1.7
 
 - Replaced the generated and traced menu artwork with clean native 16×16

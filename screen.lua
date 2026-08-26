@@ -543,6 +543,27 @@ return function(mod, icons)
     if renderer and renderer.setUIAnchor then
       renderer:setUIAnchor(layout.panelX, layout.panelY,
         PANEL_W, PANEL_H, "topright")
+      -- Dynamic UI normally follows the overworld's survey zoom. That is a
+      -- useful default for classic screen furniture, but it makes this
+      -- already-compact panel half-size when a Pocket Taco / controller
+      -- overlay is paired with a zoomed-out map. The anchor has already been
+      -- recorded above, so give Renderer:endFrame one FIT-scale answer while
+      -- leaving Dynamic UI itself enabled. The wrapper removes itself on that
+      -- call, before render.compose / render.hud mods run; the map keeps its
+      -- own zoom and the phone remains docked at the top right.
+      if renderer.worldActive and renderer.uiCentered ~= true
+          and not renderer.modernStartMenuScaleHold
+          and type(renderer.uiScale) == "function"
+          and type(renderer.fitScale) == "function" then
+        local originalUIScale = renderer.uiScale
+        local readableScale = renderer:fitScale()
+        renderer.modernStartMenuScaleHold = true
+        renderer.uiScale = function(active)
+          active.uiScale = originalUIScale
+          active.modernStartMenuScaleHold = nil
+          return readableScale
+        end
+      end
     end
     love.graphics.push("all")
     drawShell(menu, layout)

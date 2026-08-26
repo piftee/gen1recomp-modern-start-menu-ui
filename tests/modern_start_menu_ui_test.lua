@@ -102,6 +102,12 @@ local game = {
   stack = stack,
   modStatus = { available = { { id = "modern_start_menu_ui" } } },
   renderer = {
+    uiCentered = false,
+    worldActive = true,
+    uiScale = function(self)
+      return self.uiCentered and 6 or 3
+    end,
+    fitScale = function() return 6 end,
     setUIAnchor = function(_, x, y, w, h, where)
       anchor = { x, y, w, h, where }
     end,
@@ -159,7 +165,13 @@ T.eq(stack:top(), nil, "Start closes the phone panel")
 -- the critical integration point that keeps the map visible in Dynamic UI.
 menu = StartMenu.new(game)
 stack:push(menu)
+T.eq(game.renderer:uiScale(), 3,
+  "a zoomed-out world would normally reduce Dynamic UI scale")
 menu:draw()
+T.eq(game.renderer:uiScale(), 6,
+  "the modern START panel stays at the readable fit scale over survey zoom")
+T.eq(game.renderer:uiScale(), 3,
+  "the scale hold restores Dynamic UI immediately after composition")
 T.eq(anchor[1], 52, "the panel keeps a native-pixel right margin")
 T.eq(anchor[2], 4, "the panel keeps a native-pixel top margin")
 T.eq(anchor[3], 104, "the complete phone panel is edge anchored")
