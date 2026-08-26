@@ -1,0 +1,29 @@
+return {
+  summary = "A Gen 1 phone-panel START menu that preserves every installed menu action.",
+  author = "ishhodaszi",
+  tags = { "ui", "cosmetic", "quality-of-life" },
+  differences = {
+    changed = {
+      "START menu presentation and directional navigation",
+      "Responsive portrait positioning above touch controls",
+      "Optional saved phone-only colour theme",
+    },
+    added = {
+      "Three-by-three paged app grid",
+      "Clean one-bit native pixel icons for built-in actions",
+      "Generic labelled tiles for third-party actions",
+      "Compact Safari status display",
+      "MAP, RED, BLUE and DMG palette choices",
+    },
+    known = {
+      "Uses engine_internals for the built-in menu controller and renderer",
+      "A total replacement StartMenu needs the standard items/update/draw controller shape",
+    },
+  },
+  credits = {
+    { who = "Gen1Recomp", for_ = "native mod platform and original UI renderer" },
+    { who = "NikoIchu", for_ = "CC0 1-bit Pixel Icons" },
+    { who = "ishhodaszi", for_ = "matching one-bit Poké Ball icon" },
+  },
+  compat = { engine = ">=0.0.0-dev <1.0.0", modApi = 2 },
+}
