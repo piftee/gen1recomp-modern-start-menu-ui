@@ -46,6 +46,7 @@ return function(game)
   else
     while game.stack:top() do game.stack:pop() end
   end
+  local scaleBeforeMenu = game.renderer:fitScale()
   local menu = Screens.push(game, "StartMenu")
   -- Preview identities do not inherit the player's enabled-mod list. Keep the
   -- driver self-contained by applying the exact production decorator when the
@@ -91,6 +92,8 @@ return function(game)
   local rendererW, rendererH = game.renderer:uiSize()
   U.log("START surface requested/rendered", requestedW, requestedH,
     rendererW, rendererH)
+  U.log("START fit scale before/after", scaleBeforeMenu,
+    game.renderer:fitScale())
   U.log("START menu theme", previewTheme)
   U.log("START menu survey zoom", previewZoom)
   U.log("START menu faithful ratio", previewFaithful and "ON" or "OFF")

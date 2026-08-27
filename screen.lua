@@ -238,8 +238,35 @@ return function(mod, icons)
     return (tonumber(options and options.faithfulRes) or 0) > 0
   end
 
+  -- A mobile input overlay is already a screen-space composition layered over
+  -- the game. Giving START a taller UI canvas at the same time changes the
+  -- renderer's fit-scale input and lets the external/mobile compositor shrink
+  -- both the world and the menu a second time. Keep the native surface while
+  -- touch controls are visible or configured, including the controllerHidden
+  -- state used by a Pocket Taco. A connected mobile gamepad is the fallback
+  -- for host overlays that hide the built-in touch artwork altogether.
+  local function mobileOverlayActive()
+    if TouchControls then
+      local okVisible, visible = pcall(TouchControls.visible, TouchControls)
+      if okVisible and visible then return true end
+      if TouchControls.active == true and TouchControls.enabled ~= false then
+        return true
+      end
+    end
+    local osName = love.system and love.system.getOS
+      and love.system.getOS() or nil
+    if (osName == "Android" or osName == "iOS")
+        and love.joystick and love.joystick.getJoysticks then
+      local okPads, pads = pcall(love.joystick.getJoysticks)
+      if okPads and type(pads) == "table" and #pads > 0 then return true end
+    end
+    return false
+  end
+
   local function responsiveSize(menu)
-    if faithfulRatioEnabled(menu) then return SCREEN_W, SCREEN_H end
+    if faithfulRatioEnabled(menu) or mobileOverlayActive() then
+      return SCREEN_W, SCREEN_H
+    end
     local pixelWidth, pixelHeight = displayPixels()
     if pixelHeight > pixelWidth then
       local scale = math.max(1, math.floor(pixelWidth / SCREEN_W))

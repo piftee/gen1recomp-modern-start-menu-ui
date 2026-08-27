@@ -38,14 +38,20 @@ Fixed themes recolour only the phone shell, leaving the visible map unchanged.
 The game's global **Colors** setting still has final say, so forced grayscale,
 inverted and Classic display modes continue to behave consistently.
 
-The panel is vertically centred at every screen size. On a portrait phone it
-uses a tall transparent native-pixel surface and centres inside the usable
-play area above visible touch controls. Landscape layouts centre the same
+The panel is vertically centred at every screen size. On a portrait phone
+without a mobile overlay, it uses a tall transparent native-pixel surface and
+centres inside the available play area. Landscape layouts centre the same
 panel on their responsive surface, while Faithful Ratio keeps it inside the
 renderer’s centred 160×144 viewport instead of pinning it to the physical top
 edge. Survey zoom continues to affect the map, but no longer scales the phone
-panel down with it; controller overlays can therefore reserve part of the
-phone without making the menu hard to read.
+panel down with it.
+
+When the mobile touch overlay is visible or a mobile controller overlay is in
+use, the menu deliberately retains the game's native 160×144 UI surface.
+Opening START therefore cannot recalculate the renderer at a smaller scale:
+the map and phone panel remain exactly the size they were before the menu
+opened. The taller portrait composition is used only when no mobile overlay is
+active.
 
 The bundled icons are a native 16×16 one-bit PNG atlas. Nine frames use
 NikoIchu's clean CC0 Pixel Icons directly on their original grid; the Pokémon

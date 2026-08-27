@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.10
+
+- Kept the native 160×144 UI surface whenever the mobile touch/controller
+  overlay is active, so opening START cannot change the renderer's fit scale.
+- Prevented the overworld and phone panel from shrinking together when a
+  Pocket Taco or another mobile overlay already reserves part of the screen.
+- Retained the centred overlay composition, Faithful Ratio behavior and the
+  optional tall portrait layout when mobile controls are genuinely absent.
+
 ## 0.1.9
 
 - Vertically centred the phone panel across compact, landscape and portrait

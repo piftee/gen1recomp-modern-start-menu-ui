@@ -196,16 +196,18 @@ T.eq(presentation.iconPaletteSize, 1,
 T.eq(presentation.iconOffsetY, 2,
   "icons sit one native pixel lower than the original tile position")
 
--- A portrait phone gets a tall transparent UI surface, then positions the
--- compact panel in the upper usable third above the touch controls. This is
--- the same geometry exercised by the Android screenshot, without depending
--- on a particular device's density.
+-- Opening START while the mobile overlay is active must not replace the
+-- native 160x144 UI surface with a tall menu-owned canvas. Keeping the same
+-- surface is what guarantees the renderer's fit scale—and therefore both the
+-- map and the menu size—cannot change just because START was pressed.
 local graphics = love.graphics
 local oldPixelDimensions = graphics.getPixelDimensions
 local oldDimensions = graphics.getDimensions
 local TouchControls = require("src.core.TouchControls")
 local oldTouchVisible, oldTouchLayout = TouchControls.visible,
   TouchControls.layout
+local oldTouchActive, oldTouchEnabled = TouchControls.active,
+  TouchControls.enabled
 graphics.getPixelDimensions = function() return 480, 960 end
 graphics.getDimensions = function() return 480, 960 end
 TouchControls.visible = function() return true end
@@ -219,6 +221,30 @@ local paletteOwner = {
   end,
 }
 table.insert(stack.states, 1, paletteOwner)
+local overlayW, overlayH = menu:uiSize()
+game.renderer.uiSize = function() return overlayW, overlayH end
+anchor = nil
+menu:draw()
+local overlayLayout = presentation.layoutFor(menu)
+T.eq(overlayW, 160, "the mobile overlay retains the native menu width")
+T.eq(overlayH, 144,
+  "the mobile overlay cannot introduce a scale-changing tall surface")
+T.eq(overlayLayout.height, 144,
+  "overlay layout uses the same native surface as the closed menu")
+T.eq(anchor, nil,
+  "overlay mode stays centred rather than adding a screen-edge anchor")
+game.renderer:uiScale() -- consume the one-frame readable-scale hold
+
+-- Physical controllers hide the built-in artwork after their first input,
+-- but the configured mobile overlay still reserves the same phone layout.
+TouchControls.visible = function() return false end
+TouchControls.active, TouchControls.enabled = true, true
+T.eq(select(2, menu:uiSize()), 144,
+  "a controller-hidden mobile overlay still retains the native surface")
+
+-- With the touch overlay explicitly absent, the optional tall portrait
+-- composition remains available and centres in the full phone play area.
+TouchControls.active = false
 local portraitW, portraitH = menu:uiSize()
 game.renderer.uiSize = function() return portraitW, portraitH end
 anchor = nil
@@ -269,6 +295,7 @@ T.eq(anchor, nil,
 game.save.options.faithfulRes = 0
 table.remove(stack.states, 1)
 TouchControls.visible, TouchControls.layout = oldTouchVisible, oldTouchLayout
+TouchControls.active, TouchControls.enabled = oldTouchActive, oldTouchEnabled
 graphics.getPixelDimensions, graphics.getDimensions = oldPixelDimensions,
   oldDimensions
 game.renderer.uiSize = nil
