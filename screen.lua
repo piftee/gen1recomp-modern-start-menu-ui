@@ -10,7 +10,6 @@ return function(mod, icons)
   local SCREEN_W, SCREEN_H = 160, 144
   local PORTRAIT_MIN_H, PORTRAIT_MAX_H = 224, 400
   local PANEL_MARGIN, PANEL_W, PANEL_H = 4, 104, 136
-  local PANEL_MAX_PORTRAIT_Y = 56
   local CELL_W, CELL_H, COL_STEP, ROW_STEP = 30, 30, 32, 32
   local PAGE_SIZE, COLUMNS = 9, 3
   local ICON_OFFSET_X, ICON_OFFSET_Y = 7, 2
@@ -306,8 +305,7 @@ return function(mod, icons)
     local panelX = width - PANEL_MARGIN - PANEL_W
     local panelY = PANEL_MARGIN
     if height >= PORTRAIT_MIN_H then
-      panelY = math.floor((availableHeight - PANEL_H) / 3)
-      panelY = math.min(PANEL_MAX_PORTRAIT_Y, panelY)
+      panelY = math.floor((availableHeight - PANEL_H) / 2)
       panelY = math.max(PANEL_MARGIN,
         math.min(height - PANEL_H - PANEL_MARGIN, panelY))
     end
@@ -540,29 +538,34 @@ return function(mod, icons)
   local function draw(menu)
     local renderer = menu.game and menu.game.renderer
     local layout = layoutFor(menu)
-    if renderer and renderer.setUIAnchor then
+    -- A tall responsive surface covers the physical play area, so its centred
+    -- panel can still dock horizontally against the right edge. Compact
+    -- 144px surfaces—including Faithful Ratio—are already centred by the
+    -- renderer; top-right docking those would discard the vertical letterbox
+    -- position and pin the phone to the physical top of a tall display.
+    if renderer and renderer.setUIAnchor
+        and layout.height >= PORTRAIT_MIN_H then
       renderer:setUIAnchor(layout.panelX, layout.panelY,
         PANEL_W, PANEL_H, "topright")
-      -- Dynamic UI normally follows the overworld's survey zoom. That is a
-      -- useful default for classic screen furniture, but it makes this
-      -- already-compact panel half-size when a Pocket Taco / controller
-      -- overlay is paired with a zoomed-out map. The anchor has already been
-      -- recorded above, so give Renderer:endFrame one FIT-scale answer while
-      -- leaving Dynamic UI itself enabled. The wrapper removes itself on that
-      -- call, before render.compose / render.hud mods run; the map keeps its
-      -- own zoom and the phone remains docked at the top right.
-      if renderer.worldActive and renderer.uiCentered ~= true
-          and not renderer.modernStartMenuScaleHold
-          and type(renderer.uiScale) == "function"
-          and type(renderer.fitScale) == "function" then
-        local originalUIScale = renderer.uiScale
-        local readableScale = renderer:fitScale()
-        renderer.modernStartMenuScaleHold = true
-        renderer.uiScale = function(active)
-          active.uiScale = originalUIScale
-          active.modernStartMenuScaleHold = nil
-          return readableScale
-        end
+    end
+    -- Dynamic UI normally follows the overworld's survey zoom. That is a
+    -- useful default for classic screen furniture, but it makes this
+    -- already-compact panel half-size when a Pocket Taco / controller
+    -- overlay is paired with a zoomed-out map. Give Renderer:endFrame one
+    -- FIT-scale answer while leaving Dynamic UI itself enabled. The wrapper
+    -- removes itself before render.compose / render.hud mods run; the map
+    -- keeps its own zoom and the phone keeps the middle alignment above.
+    if renderer and renderer.worldActive and renderer.uiCentered ~= true
+        and not renderer.modernStartMenuScaleHold
+        and type(renderer.uiScale) == "function"
+        and type(renderer.fitScale) == "function" then
+      local originalUIScale = renderer.uiScale
+      local readableScale = renderer:fitScale()
+      renderer.modernStartMenuScaleHold = true
+      renderer.uiScale = function(active)
+        active.uiScale = originalUIScale
+        active.modernStartMenuScaleHold = nil
+        return readableScale
       end
     end
     love.graphics.push("all")

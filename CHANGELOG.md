@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.9
+
+- Vertically centred the phone panel across compact, landscape and portrait
+  layouts instead of biasing it toward the top edge.
+- Centred portrait layouts inside the usable play area above visible touch
+  controls, retaining the right-edge dock and readable survey-zoom scale.
+- Kept Faithful Ratio inside the renderer's centred native 160×144 viewport,
+  fixing the panel being pinned to the physical top of tall phone screens.
+
 ## 0.1.8
 
 - Kept the phone panel at the normal readable UI scale when the overworld is

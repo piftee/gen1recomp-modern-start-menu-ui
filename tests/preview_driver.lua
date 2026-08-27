@@ -6,19 +6,23 @@ return function(game)
   local dir = os.getenv("SHOT_DIR") or "/tmp/modern-start-menu-ui"
   local previewTheme = os.getenv("POKEPORT_START_MENU_THEME") or "map"
   local previewZoom = tonumber(os.getenv("POKEPORT_START_MENU_ZOOM")) or 0
+  local previewFaithful = os.getenv("POKEPORT_START_MENU_FAITHFUL") == "1"
 
   game.save.flags = game.save.flags or {}
   game.save.flags.EVENT_GOT_POKEDEX = true
   game.save.playTime = 13 * 3600 + 7 * 60
   game.save.options = game.save.options or {}
   game.save.options.uiLayout = "dynamic"
-  game.save.options.faithfulRes = 0
+  game.save.options.faithfulRes = previewFaithful and 1 or 0
   game.save.options.zoom = previewZoom
   require("src.render.Zoom").offset = previewZoom
   if os.getenv("POKEPORT_START_MENU_PORTRAIT_PREVIEW") == "1"
       and love.window and love.window.setMode then
     love.window.setMode(589, 1280, { resizable = false, highdpi = false })
     U.wait(3)
+  end
+  if previewFaithful then
+    require("src.core.FaithfulRes").apply(1)
   end
   Runtime.hooks:wrap("ui.start_menu.items", function(next, game_, items)
     local out = next(game_, items)
@@ -89,6 +93,7 @@ return function(game)
     rendererW, rendererH)
   U.log("START menu theme", previewTheme)
   U.log("START menu survey zoom", previewZoom)
+  U.log("START menu faithful ratio", previewFaithful and "ON" or "OFF")
   U.log(menu.modernStartMenuUI and "PASS modern START menu is active"
     or "FAIL modern START menu was not installed")
   U.shot(game, dir .. "/modern_start_menu_ui_page_1.png")

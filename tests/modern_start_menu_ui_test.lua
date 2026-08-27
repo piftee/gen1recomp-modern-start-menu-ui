@@ -161,22 +161,21 @@ menu.noSound = true
 press(menu, "start")
 T.eq(stack:top(), nil, "Start closes the phone panel")
 
--- Drawing is exercised with the real headless graphics stub. The anchor is
--- the critical integration point that keeps the map visible in Dynamic UI.
+-- A compact 160x144 surface is already centred by the renderer. Leaving it
+-- unanchored keeps the phone vertically centred in that faithful viewport
+-- instead of pinning it to the physical top edge of a tall display.
 menu = StartMenu.new(game)
 stack:push(menu)
 T.eq(game.renderer:uiScale(), 3,
   "a zoomed-out world would normally reduce Dynamic UI scale")
+anchor = nil
 menu:draw()
 T.eq(game.renderer:uiScale(), 6,
   "the modern START panel stays at the readable fit scale over survey zoom")
 T.eq(game.renderer:uiScale(), 3,
   "the scale hold restores Dynamic UI immediately after composition")
-T.eq(anchor[1], 52, "the panel keeps a native-pixel right margin")
-T.eq(anchor[2], 4, "the panel keeps a native-pixel top margin")
-T.eq(anchor[3], 104, "the complete phone panel is edge anchored")
-T.eq(anchor[4], 136, "the shell ends after its footer instead of filling the screen")
-T.eq(anchor[5], "topright", "Dynamic UI docks the panel to the right edge")
+T.eq(anchor, nil,
+  "compact and faithful surfaces retain the renderer's middle alignment")
 
 local presentation = run.loader.exports.modern_start_menu_ui.presentation
 T.eq(presentation.iconFor({ id = "save", label = "ANYTHING" }), "save",
@@ -222,13 +221,14 @@ local paletteOwner = {
 table.insert(stack.states, 1, paletteOwner)
 local portraitW, portraitH = menu:uiSize()
 game.renderer.uiSize = function() return portraitW, portraitH end
+anchor = nil
 menu:draw()
 local portraitLayout = presentation.layoutFor(menu)
 local portraitZones = menu:sgbPalettes(game)
 T.eq(portraitW, 160, "portrait mode retains a readable native width")
 T.eq(portraitH, 320, "portrait mode uses the available phone height")
-T.check(anchor[2] > 4,
-  "the portrait phone panel no longer sticks to the top edge")
+T.eq(anchor[2], math.floor((portraitLayout.availableHeight - 136) / 2),
+  "the portrait phone panel is centred in the usable height")
 T.check(anchor[2] + anchor[4] < portraitLayout.availableHeight,
   "the portrait phone panel ends above the visible controls")
 T.eq(portraitZones[1].h, portraitH,
@@ -251,6 +251,22 @@ T.eq(phoneZone.h, portraitLayout.panelH,
 T.eq(phoneZone.colors[2][1], 255,
   "the RED theme supplies its authored warm accent")
 run.loader.modOptions.modern_start_menu_ui.theme = "map"
+
+-- Faithful Ratio deliberately restores a compact 160x144 canvas even on a
+-- portrait phone. It must use that canvas's centred viewport instead of
+-- re-applying the ordinary top-right screen-edge anchor.
+game.save.options.faithfulRes = 1
+anchor = nil
+local faithfulW, faithfulH = menu:uiSize()
+local faithfulLayout = presentation.layoutFor(menu)
+menu:draw()
+T.eq(faithfulW, 160, "Faithful Ratio retains the native menu width")
+T.eq(faithfulH, 144, "Faithful Ratio retains the native menu height")
+T.eq(faithfulLayout.panelY, 4,
+  "the phone stays centred inside the faithful viewport")
+T.eq(anchor, nil,
+  "Faithful Ratio does not pin the phone to the physical top edge")
+game.save.options.faithfulRes = 0
 table.remove(stack.states, 1)
 TouchControls.visible, TouchControls.layout = oldTouchVisible, oldTouchLayout
 graphics.getPixelDimensions, graphics.getDimensions = oldPixelDimensions,
