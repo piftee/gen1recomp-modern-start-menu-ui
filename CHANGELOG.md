@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.1.13
+
+- Prevented fixed phone-theme palette zones from leaking into Save summaries,
+  YES/NO choices and dialogue boxes when a compatible START controller keeps
+  the phone beneath the transparent Save stack.
+- Restored the normal inherited full-screen palette for overlays while
+  retaining the selected theme whenever the phone itself is active.
+
+## 0.1.12
+
+- Consolidated every in-game preference under one **Modern Start Menu** row
+  in Options, with a dedicated phone-theme and mod-entry settings page.
+- Added a two-page 4×4 visual selector for third-party START actions, with 32
+  native choices including Auto, Quest, Map, Music, Camera, Trophy, Tools,
+  Mail, Shop, Battle, Potion, Bike, Craft and Search.
+- Expanded the atlas from 10 to 32 native 16×16 one-bit frames selected from
+  NikoIchu's CC0 Pixel Icons v1.2; no scaling, tracing or interpolation is used.
+- Removed the duplicate miniature captions from each START button and
+  vertically centred the icons; the full selected action name remains in the
+  footer.
+- Persisted picker changes immediately and refreshed the settings row without
+  requiring the menu or game to be reopened.
+
+## 0.1.11
+
+- Kept START on the game's existing 160×144 render surface on every display,
+  preventing screen-position modes and the SAVE prompt from recentering the
+  map or moving the phone panel when they take over.
+- Added saved per-entry icon selectors to the regular Options screen for
+  third-party START actions, with AUTO plus every bundled native icon.
+- Recognized common DEX/PARTY aliases automatically and folded Latin accents,
+  so Portuguese labels such as `OPÇÕES` render cleanly as `OPCOES` instead
+  of broken question marks.
+- Accepted Gen 2's native split play-time clock when drawing the phone header,
+  preventing Gold, Silver and Crystal from crashing as START opens.
+- Labelled the Gen 2 POKéGEAR action as GEAR instead of LINK. Genuine Link
+  actions retain their own LINK caption.
+
 ## 0.1.10
 
 - Kept the native 160×144 UI surface whenever the mobile touch/controller

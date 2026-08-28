@@ -6,8 +6,11 @@
 -- authored one-bit Poké Ball on the same grid.
 
 local ICONS = {
-  "pokedex", "party", "bag", "trainer", "save",
-  "options", "link", "mods", "quit", "generic",
+  "pokedex", "party", "bag", "trainer", "save", "options",
+  "pokegear", "link", "mods", "quit", "generic", "auto",
+  "quest", "map", "music", "camera", "trophy", "heart", "star",
+  "tools", "key", "clock", "mail", "chat", "home", "shop",
+  "chest", "battle", "potion", "bicycle", "craft", "search",
 }
 
 local NIKO_SOURCE = {
@@ -16,10 +19,32 @@ local NIKO_SOURCE = {
   trainer = "trainer.png",
   save = "save.png",
   options = "options.png",
+  pokegear = "pokegear.png",
   link = "link.png",
   mods = "mods.png",
   quit = "quit.png",
   generic = "generic.png",
+  auto = "auto.png",
+  quest = "quest.png",
+  map = "map.png",
+  music = "music.png",
+  camera = "camera.png",
+  trophy = "trophy.png",
+  heart = "heart.png",
+  star = "star.png",
+  tools = "tools.png",
+  key = "key.png",
+  clock = "clock.png",
+  mail = "mail.png",
+  chat = "chat.png",
+  home = "home.png",
+  shop = "shop.png",
+  chest = "chest.png",
+  battle = "battle.png",
+  potion = "potion.png",
+  bicycle = "bicycle.png",
+  craft = "craft.png",
+  search = "search.png",
 }
 
 local PARTY = {
@@ -151,7 +176,7 @@ function love.load()
     local left, top, right, bottom = bounds(frame)
     atlas:paste(frame, (index - 1) * SIZE, 0, 0, 0, SIZE, SIZE)
     writeAll(join(nativeDir, id .. ".png"), encode(frame))
-    print(("%-8s native=16x16 bounds=%d,%d-%d,%d"):format(
+    print(("%-10s native=16x16 bounds=%d,%d-%d,%d"):format(
       id, left, top, right, bottom))
   end
 

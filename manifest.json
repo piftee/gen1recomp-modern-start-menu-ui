@@ -1,9 +1,10 @@
 {
   "id": "modern_start_menu_ui",
   "name": "Modern Start Menu UI",
-  "version": "0.1.10",
+  "version": "0.1.13",
   "github": "piftee/gen1recomp-modern-start-menu-ui",
   "api": 2,
+  "games": ["gen1", "gen2"],
   "entry": "main.lua",
   "profile": "content",
   "game_version": ">=0.0.0-dev <1.0.0",
@@ -15,5 +16,5 @@
   "incompatible": [],
   "permissions": ["engine_internals"],
   "experimental": false,
-  "description": "A mod-compatible Gen 1 phone-panel presentation for the START menu."
+  "description": "A mod-compatible phone-panel presentation for Gen 1 and Gen 2 START menus."
 }
