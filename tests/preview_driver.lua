@@ -15,6 +15,16 @@ return function(game)
   game.save.options.uiLayout = "dynamic"
   game.save.options.faithfulRes = previewFaithful and 1 or 0
   game.save.options.zoom = previewZoom
+  game.save.options.modOptions = game.save.options.modOptions or {}
+  game.save.options.modOptions.modern_start_menu_ui =
+    game.save.options.modOptions.modern_start_menu_ui or {}
+  game.save.options.modOptions.modern_start_menu_ui.theme = previewTheme
+  if game.mods then
+    game.mods.modOptions = game.mods.modOptions or {}
+    game.mods.modOptions.modern_start_menu_ui =
+      game.mods.modOptions.modern_start_menu_ui or {}
+    game.mods.modOptions.modern_start_menu_ui.theme = previewTheme
+  end
   require("src.render.Zoom").offset = previewZoom
   if os.getenv("POKEPORT_START_MENU_PORTRAIT_PREVIEW") == "1"
       and love.window and love.window.setMode then
@@ -26,9 +36,15 @@ return function(game)
   end
   Runtime.hooks:wrap("ui.start_menu.items", function(next, game_, items)
     local out = next(game_, items)
+    for _, item in ipairs(out) do
+      if item.id == "save" then item.label, item.shortLabel = "SALVAR", nil end
+      if item.id == "options" then item.label, item.shortLabel = "OPÇÕES", nil end
+      if item.id == "quit" then item.label, item.shortLabel = "SAIR", nil end
+    end
     out[#out + 1] = { label = "DEXNAV SUPER LONG LABEL", shortLabel = "NAV",
       onSelect = function() end }
-    out[#out + 1] = { label = "QUEST LOG", shortLabel = "QUEST",
+    out[#out + 1] = { id = "localized_tool", label = "OPÇÕES",
+      shortLabel = "OPÇÕES",
       onSelect = function() end }
     return out
   end, -1000, "modern-start-preview")
@@ -105,4 +121,85 @@ return function(game)
   menu.scroll = 9
   U.wait(10)
   U.shot(game, dir .. "/modern_start_menu_ui_page_2.png")
+
+  -- Options exposes one entry for this mod. Its dedicated page lists every
+  -- discovered third-party action, and selecting one opens the visual 4x4
+  -- icon grid. Capture both grid pages and apply DEX to prove persistence and
+  -- the live icon swap visually.
+  if game.stack:top() == menu then game.stack:pop() end
+  local options = Screens.push(game, "OptionsMenu")
+  local settingsRow
+  for index, row in ipairs(options.rows or {}) do
+    if row.id == "modern_start_menu_ui_settings_open" then
+      settingsRow = row
+      options.index = index
+      options.scroll = math.max(0, index - 4)
+      break
+    end
+  end
+  if settingsRow then
+    U.wait(8)
+    U.log("PASS dedicated Modern Start Menu row is present")
+    U.shot(game, dir .. "/modern_start_menu_ui_options_entry.png")
+    settingsRow.activate(game)
+    local settings = game.stack:top()
+    U.wait(8)
+    U.shot(game, dir .. "/modern_start_menu_ui_settings.png")
+    local selector
+    for index, item in ipairs(settings.items or {}) do
+      if tostring(item.key):find("DEXNAV", 1, true) then
+        selector = item
+        settings.index = index
+        settings.scroll = math.max(0, index - 4)
+        break
+      end
+    end
+    if selector then
+      settings.onChoose(selector, settings)
+      local picker = game.stack:top()
+      U.wait(8)
+      U.log("PASS third-party entry opens the icon grid")
+      U.shot(game, dir .. "/modern_start_menu_ui_icon_grid_1.png")
+      picker.index = 17
+      U.wait(8)
+      U.shot(game, dir .. "/modern_start_menu_ui_icon_grid_2.png")
+      picker.index = 2
+      U.tap(game, "a")
+      U.wait(5)
+    else
+      U.log("FAIL DEXNAV selector is missing from dedicated settings")
+    end
+    if game.stack:top() == settings then game.stack:pop() end
+    if game.stack:top() == options then game.stack:pop() end
+    menu = Screens.push(game, "StartMenu")
+    for index, item in ipairs(menu.items) do
+      if tostring(item.label):find("DEXNAV", 1, true) then
+        menu.index = index
+        menu.scroll = math.floor((index - 1) / 9) * 9
+        break
+      end
+    end
+    U.wait(8)
+    U.log("PASS selected third-party icon applies immediately")
+    U.shot(game, dir .. "/modern_start_menu_ui_custom_icon.png")
+
+    local saveItem
+    for _, item in ipairs(menu.items) do
+      if item.id == "save" then saveItem = item break end
+    end
+    if saveItem and type(saveItem.onSelect) == "function" then
+      -- Deliberately retain START below the transparent Save stack. Some
+      -- compatible menu controllers do this, and it is the exact palette-
+      -- ownership path that used to leak the phone theme through half of the
+      -- summary and dialogue boxes.
+      saveItem.onSelect()
+      U.wait(120)
+      U.log("PASS SAVE prompt retains viewport without phone-theme leakage")
+      U.shot(game, dir .. "/modern_start_menu_ui_save_prompt.png")
+    else
+      U.log("FAIL SAVE action is missing")
+    end
+  else
+    U.log("FAIL dedicated Modern Start Menu row is missing")
+  end
 end

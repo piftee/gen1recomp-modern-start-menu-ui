@@ -4,6 +4,9 @@ Modern Start Menu UI presents Pokémon Red's START menu as a compact Gen 1
 phone panel. The map remains visible on the left while every available action
 appears in a paged three-by-three icon grid.
 
+Gold, Silver, and Crystal use the same phone panel over the native Gen 2 START
+controller, including PACK and POKéGEAR actions.
+
 The mod changes presentation only. Pokémon, Bag, Pokédex, Trainer, Save,
 Options, Link, Mods, Quit and third-party entries retain the callbacks built by
 the engine and by `ui.start_menu.items` mods.
@@ -24,10 +27,21 @@ the classic list without changing the save file.
 The current tile is restored the next time the menu opens. More than nine
 entries create additional pages automatically. Long labels scroll through the
 footer, and entries with no recognized ID receive a generic menu-symbol tile.
+Buttons show only their centred 16×16 symbol; the full selected label in the
+footer provides the name without squeezing tiny duplicate text into each tile.
+
+After opening START once, use **Options → Modern Start Menu**. The dedicated
+page contains the phone theme and one row for every third-party START action.
+Selecting an action opens a two-page 4×4 visual grid. Leave it on **Auto** to
+use the entry's ID or label, or choose from 31 explicit native symbols such as
+Dex, PKMN, Bag, Quest, Map, Music, Camera, Trophy, Tools, Mail, Shop, Battle,
+Potion, Bike and Search. Overrides are saved per entry and apply immediately.
+Common third-party `DEX` and `PARTY` labels are recognized automatically.
 
 ## Themes
 
-Open **Options → Phone Theme** to switch between four saved treatments:
+Open **Options → Modern Start Menu → Phone Theme** to switch between four
+saved treatments:
 
 - **MAP** inherits the current location and remains the default.
 - **RED** uses a warm Pokédex-inspired coral and crimson ramp.
@@ -38,22 +52,15 @@ Fixed themes recolour only the phone shell, leaving the visible map unchanged.
 The game's global **Colors** setting still has final say, so forced grayscale,
 inverted and Classic display modes continue to behave consistently.
 
-The panel is vertically centred at every screen size. On a portrait phone
-without a mobile overlay, it uses a tall transparent native-pixel surface and
-centres inside the available play area. Landscape layouts centre the same
-panel on their responsive surface, while Faithful Ratio keeps it inside the
-renderer’s centred 160×144 viewport instead of pinning it to the physical top
-edge. Survey zoom continues to affect the map, but no longer scales the phone
-panel down with it.
+The panel always uses the renderer's existing native 160×144 UI surface. It
+therefore inherits the player's centred/top/high screen position instead of
+recentring the world when START opens, and the SAVE prompt takes over without
+moving the underlying composition. Faithful Ratio, portrait displays, mobile
+touch/controller overlays and landscape layouts all retain that same surface.
+Survey zoom continues to affect the map, but no longer scales the phone panel
+down with it.
 
-When the mobile touch overlay is visible or a mobile controller overlay is in
-use, the menu deliberately retains the game's native 160×144 UI surface.
-Opening START therefore cannot recalculate the renderer at a smaller scale:
-the map and phone panel remain exactly the size they were before the menu
-opened. The taller portrait composition is used only when no mobile overlay is
-active.
-
-The bundled icons are a native 16×16 one-bit PNG atlas. Nine frames use
+The bundled icons are a native 16×16 one-bit PNG atlas. Thirty-one frames use
 NikoIchu's clean CC0 Pixel Icons directly on their original grid; the Pokémon
 party frame is a matching custom Poké Ball. The offline packer changes only
 the source's black/white canvas into opaque ink and transparency. It never
@@ -63,15 +70,17 @@ display palette recolours that single ink shade alongside the themed panel.
 ## Compatibility
 
 The presentation consumes the final `ui.start_menu.items` result. Mods may keep
-using legacy `{ label, onSelect }` rows unchanged; optional `id` and
-`shortLabel` fields improve icon and caption selection. On newer engines the
+using legacy `{ label, onSelect }` rows unchanged; an optional stable `id`
+improves automatic icon selection and saved override keys. On newer engines the
 mod uses `ui.start_menu.presentation`. On earlier API 2 mobile builds it falls
 back to the existing `screen.pushed` lifecycle event, after the finished menu
 has been placed on the stack. A total replacement remains compatible when it
 exposes the usual StartMenu controller fields (`items`, `update`, and `draw`).
 Legacy rows labelled with the current player name are recognized as the
-trainer profile; other unknown labels retain their caption and receive the
-generic menu icon.
+trainer profile; other unknown labels retain their footer name and receive the
+generic menu icon until the player chooses an override. Latin-script accents
+are folded into the compact alphabet (`Ç` to `C`, `Õ` to `O`, and so on),
+while other scripts retain the game's native-font footer fallback.
 
 ## Develop
 

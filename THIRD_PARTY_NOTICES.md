@@ -2,8 +2,8 @@
 
 ## NikoIchu — 1-bit Pixel Icons
 
-Modern Start Menu UI uses selected native 16×16 symbols from NikoIchu's
-**1-bit Pixel Icons** collection:
+Modern Start Menu UI uses 31 selected native 16×16 symbols from NikoIchu's
+**1-bit Pixel Icons** v1.2 collection:
 
 <https://nikoichu.itch.io/pixel-icons>
 

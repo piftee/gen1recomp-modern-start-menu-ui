@@ -5,13 +5,15 @@ return {
   differences = {
     changed = {
       "START menu presentation and directional navigation",
-      "Responsive portrait positioning above touch controls",
+      "Stable native viewport positioning across screen modes",
       "Optional saved phone-only colour theme",
+      "Icon-only buttons with the selected action named in the footer",
     },
     added = {
       "Three-by-three paged app grid",
-      "Clean one-bit native pixel icons for built-in actions",
-      "Generic labelled tiles for third-party actions",
+      "32 clean one-bit native pixel icons",
+      "Generic third-party tiles with full footer labels",
+      "Dedicated visual icon selector for third-party actions",
       "Compact Safari status display",
       "MAP, RED, BLUE and DMG palette choices",
     },

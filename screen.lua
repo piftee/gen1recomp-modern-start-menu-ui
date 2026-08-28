@@ -12,7 +12,10 @@ return function(mod, icons)
   local PANEL_MARGIN, PANEL_W, PANEL_H = 4, 104, 136
   local CELL_W, CELL_H, COL_STEP, ROW_STEP = 30, 30, 32, 32
   local PAGE_SIZE, COLUMNS = 9, 3
-  local ICON_OFFSET_X, ICON_OFFSET_Y = 7, 2
+  -- Tile captions duplicate the authoritative footer and made every icon
+  -- fight for the top two-thirds of its cell. With captions removed, keep
+  -- the native 16x16 art optically centred in the full 30px button.
+  local ICON_OFFSET_X, ICON_OFFSET_Y = 7, 7
   local iconAtlas, iconQuads, iconLoadFailed
 
   local WHITE, LIGHT, DARK, INK = 1, 0.82, 0.34, 0
@@ -38,17 +41,29 @@ return function(mod, icons)
   local BUILTIN_IDS = {
     pokedex = true, party = true, bag = true, trainer = true, save = true,
     options = true, link = true, mods = true, quit = true,
+    pokemon = true, pack = true, pokegear = true, status = true,
+    option = true,
+  }
+  local VALUE_IDS = {
+    pokemon = "party", pack = "bag",
+    status = "trainer", option = "options",
   }
   local LABEL_IDS = {
-    ["POKéDEX"] = "pokedex", ["POKEDEX"] = "pokedex",
-    ["POKéMON"] = "party", ["POKEMON"] = "party",
-    ITEM = "bag", BAG = "bag", SAVE = "save", OPTION = "options",
-    OPTIONS = "options", LINK = "link", MODS = "mods", QUIT = "quit",
+    POKEDEX = "pokedex", DEX = "pokedex",
+    POKEMON = "party", PARTY = "party", PKMN = "party",
+    ITEM = "bag", ITEMS = "bag", ITENS = "bag", BAG = "bag", PACK = "bag",
+    SAVE = "save", SALVAR = "save",
+    OPTION = "options", ["<PO><KE>GEAR"] = "pokegear",
+    POKEGEAR = "pokegear",
+    OPTIONS = "options", OPCOES = "options", LINK = "link", MODS = "mods",
+    QUIT = "quit", SAIR = "quit", SALIR = "quit",
     TRAINER = "trainer", PLAYER = "trainer",
   }
+  local CUSTOM_ALIAS_LABELS = { DEX = true, PARTY = true, PKMN = true }
   local LEGACY_SHORT_LABELS = {
     pokedex = "DEX", party = "PKMN", bag = "BAG", trainer = "ID",
-    save = "SAVE", options = "OPT", link = "LINK", mods = "MODS",
+    save = "SAVE", options = "OPT", pokegear = "GEAR", link = "LINK",
+    mods = "MODS",
     quit = "QUIT",
   }
 
@@ -90,14 +105,28 @@ return function(mod, icons)
       math.floor(w), math.floor(h))
   end
 
-  local function miniText(text)
+  local function foldLatin(text)
     text = tostring(text or "")
-    text = text:gsub("é", "E"):gsub("è", "E"):gsub("ê", "E")
-      :gsub("á", "A"):gsub("à", "A"):gsub("â", "A")
-      :gsub("í", "I"):gsub("ó", "O"):gsub("ú", "U")
-      :gsub("É", "E"):gsub("È", "E"):gsub("Ê", "E")
-      :gsub("Á", "A"):gsub("À", "A"):gsub("Â", "A")
-      :gsub("Í", "I"):gsub("Ó", "O"):gsub("Ú", "U")
+    return text
+      :gsub("á", "A"):gsub("à", "A"):gsub("â", "A"):gsub("ã", "A")
+      :gsub("ä", "A"):gsub("å", "A"):gsub("Á", "A"):gsub("À", "A")
+      :gsub("Â", "A"):gsub("Ã", "A"):gsub("Ä", "A"):gsub("Å", "A")
+      :gsub("ç", "C"):gsub("Ç", "C")
+      :gsub("é", "E"):gsub("è", "E"):gsub("ê", "E"):gsub("ë", "E")
+      :gsub("É", "E"):gsub("È", "E"):gsub("Ê", "E"):gsub("Ë", "E")
+      :gsub("í", "I"):gsub("ì", "I"):gsub("î", "I"):gsub("ï", "I")
+      :gsub("Í", "I"):gsub("Ì", "I"):gsub("Î", "I"):gsub("Ï", "I")
+      :gsub("ñ", "N"):gsub("Ñ", "N")
+      :gsub("ó", "O"):gsub("ò", "O"):gsub("ô", "O"):gsub("õ", "O")
+      :gsub("ö", "O"):gsub("Ó", "O"):gsub("Ò", "O"):gsub("Ô", "O")
+      :gsub("Õ", "O"):gsub("Ö", "O")
+      :gsub("ú", "U"):gsub("ù", "U"):gsub("û", "U"):gsub("ü", "U")
+      :gsub("Ú", "U"):gsub("Ù", "U"):gsub("Û", "U"):gsub("Ü", "U")
+      :gsub("ý", "Y"):gsub("ÿ", "Y"):gsub("Ý", "Y")
+  end
+
+  local function miniText(text)
+    text = foldLatin(text)
     text = text:upper()
     return (text:gsub("[^A-Z0-9:/%.%-%? ]", "?"))
   end
@@ -139,11 +168,14 @@ return function(mod, icons)
     drawSmall(text, x + math.max(0, (width - smallWidth(text)) / 2), y, shade)
   end
 
-  local function normalizedId(item, game)
+  local function detectedId(item, game)
     local id = type(item) == "table" and item.id or nil
-    if type(id) == "string" and BUILTIN_IDS[id] then return id end
+    if type(id) ~= "string" and type(item) == "table" then id = item.value end
+    if type(id) == "string" and BUILTIN_IDS[id] then
+      return VALUE_IDS[id] or id
+    end
     local label = type(item) == "table" and tostring(item.label or "") or ""
-    local upper = label:upper()
+    local upper = foldLatin(label):upper()
     local known = LABEL_IDS[upper]
     if known then return known end
     -- API 2 phone builds predate stable START-menu item ids. Their trainer
@@ -151,8 +183,48 @@ return function(mod, icons)
     -- authoritative value before falling back to a third-party monogram.
     local player = game and game.save and game.save.player
     local playerName = player and tostring(player.name or "") or ""
-    if playerName ~= "" and upper == playerName:upper() then return "trainer" end
+    if playerName ~= "" and upper == foldLatin(playerName):upper() then
+      return "trainer"
+    end
     return "generic"
+  end
+
+  local function entryKey(item)
+    if type(item) ~= "table" then return "label:UNKNOWN" end
+    if type(item.id) == "string" and item.id ~= "" then
+      return "id:" .. item.id
+    end
+    if type(item.value) == "string" and item.value ~= "" then
+      return "value:" .. item.value
+    end
+    local label = miniText(item.label or "UNKNOWN")
+    label = label:gsub("%s+", " "):gsub("^%s+", ""):gsub("%s+$", "")
+    return "label:" .. (label ~= "" and label or "UNKNOWN")
+  end
+
+  local function isCustomItem(item, game)
+    if type(item) ~= "table" then return true end
+    local id = type(item.id) == "string" and item.id or nil
+    local value = type(item.value) == "string" and item.value or nil
+    if id then return not BUILTIN_IDS[id] end
+    if value then return not BUILTIN_IDS[value] end
+    local label = foldLatin(item.label or ""):upper()
+    if CUSTOM_ALIAS_LABELS[label] then return true end
+    if LABEL_IDS[label] then return false end
+    local player = game and game.save and game.save.player
+    local playerName = player and foldLatin(player.name or ""):upper() or ""
+    return playerName == "" or label ~= playerName
+  end
+
+  local function normalizedId(item, game)
+    if mod and type(mod.startMenuIconOverrideFor) == "function" then
+      local ok, override = pcall(mod.startMenuIconOverrideFor, item, game)
+      if ok and type(override) == "string"
+          and override ~= "auto" and (icons.frames or {})[override] ~= nil then
+        return override
+      end
+    end
+    return detectedId(item, game)
   end
 
   local function loadIconAtlas()
@@ -274,60 +346,31 @@ return function(mod, icons)
         math.floor(pixelHeight / scale))
       if height >= PORTRAIT_MIN_H then return SCREEN_W, height end
     end
+    local scale = math.max(1, math.floor(math.min(
+      pixelWidth / SCREEN_W, pixelHeight / SCREEN_H)))
+    return math.min(640, math.max(SCREEN_W, math.floor(pixelWidth / scale))),
+      SCREEN_H
+  end
+
+  local function uiSize()
+    -- Never change the renderer's logical surface merely because START is
+    -- open. Screen-position modes, survey zoom and native prompts all compute
+    -- their composition from this 160x144 contract; a taller menu-owned
+    -- surface made the map jump and then jump back when SAVE opened.
     return SCREEN_W, SCREEN_H
   end
 
-  local function uiSize(menu)
-    return responsiveSize(menu)
-  end
-
-  local function portraitControlsTop(pixelWidth, pixelHeight)
-    if not TouchControls or pixelHeight <= pixelWidth then return nil end
-    local okVisible, visible = pcall(TouchControls.visible, TouchControls)
-    if not okVisible or not visible then return nil end
-    local okLayout, controls = pcall(TouchControls.layout, TouchControls)
-    if not okLayout or type(controls) ~= "table" then return nil end
-    local _, unitHeight = love.graphics.getDimensions()
-    unitHeight = tonumber(unitHeight) or pixelHeight
-    if unitHeight <= 0 then return nil end
-    local dpiY = pixelHeight / unitHeight
-    local top
-    for _, name in ipairs({ "dpad", "a", "b", "start", "select" }) do
-      local zone = controls[name]
-      if type(zone) == "table" and tonumber(zone.cy) and tonumber(zone.w) then
-        local y = (zone.cy - zone.w * 0.58) * dpiY
-        top = top and math.min(top, y) or y
-      end
-    end
-    return top and math.max(SCREEN_H, math.floor(top)) or nil
-  end
-
   local function layoutFor(menu)
-    local width, height = responsiveSize(menu)
-    local renderer = menu and menu.game and menu.game.renderer
-    if not faithfulRatioEnabled(menu) and renderer and renderer.uiSize then
-      local ok, rendererWidth, rendererHeight = pcall(renderer.uiSize, renderer)
-      if ok then
-        width = tonumber(rendererWidth) or width
-        height = tonumber(rendererHeight) or height
-      end
+    local width, height = SCREEN_W, SCREEN_H
+    -- Gen 2's optional final HUD pass is already outside the stack renderer;
+    -- it can use the wide display without mutating the game's UI surface.
+    if menu and menu.modernStartGen2 and menu.modernStartHudPass then
+      width, height = responsiveSize(menu)
     end
     width = math.max(SCREEN_W, math.floor(width))
     height = math.max(SCREEN_H, math.floor(height))
 
     local availableHeight = height
-    local pixelWidth, pixelHeight = displayPixels()
-    local controlsTop = portraitControlsTop(pixelWidth, pixelHeight)
-    if controlsTop and height >= PORTRAIT_MIN_H then
-      local scale = math.max(1, math.floor(math.min(
-        pixelWidth / width, pixelHeight / height)))
-      local offsetY = math.max(0,
-        math.floor((pixelHeight - height * scale) / 2))
-      local usable = math.floor((controlsTop - offsetY) / scale)
-      if usable >= PANEL_H + PANEL_MARGIN * 2 then
-        availableHeight = math.min(height, usable)
-      end
-    end
 
     local panelX = width - PANEL_MARGIN - PANEL_W
     local panelY = PANEL_MARGIN
@@ -386,6 +429,14 @@ return function(mod, icons)
         break
       end
     end
+    -- Some compatible START controllers keep themselves on the stack while
+    -- SAVE pushes its summary, YES/NO and dialogue boxes. Those transparent
+    -- overlays inherit the nearest palette owner underneath: this menu. A
+    -- fixed phone-theme zone must therefore exist only while the phone is the
+    -- actual top state, or its right-hand rectangle recolors half of every
+    -- Save box. Returning the inherited map zones here exactly matches the
+    -- palette those overlays would receive after an ordinary START pop.
+    local phoneIsTop = menuIndex ~= nil and menuIndex == #states
     if menuIndex then
       for index = menuIndex - 1, 1, -1 do
         local state = states[index]
@@ -403,7 +454,8 @@ return function(mod, icons)
               base.w = math.max(tonumber(base.w) or 0, layout.width)
               base.h = math.max(tonumber(base.h) or 0, layout.height)
             end
-            return applyPanelTheme(inherited, layout)
+            return phoneIsTop and applyPanelTheme(inherited, layout)
+              or inherited
           end
         end
       end
@@ -411,11 +463,24 @@ return function(mod, icons)
     if PaletteFX and game and game.data then
       local colors = PaletteFX.pal(game.data, "MEWMON")
       if colors then
-        return applyPanelTheme({ { colors = colors, x = 0, y = 0,
-          w = layout.width, h = layout.height } }, layout)
+        local base = { { colors = colors, x = 0, y = 0,
+          w = layout.width, h = layout.height } }
+        return phoneIsTop and applyPanelTheme(base, layout) or base
       end
     end
-    return applyPanelTheme(nil, layout)
+    return phoneIsTop and applyPanelTheme(nil, layout) or nil
+  end
+
+  local function currentIndex(menu)
+    if menu and menu.modernStartGen2 and menu.list then
+      return menu.list.index or menu.index or 1
+    end
+    return menu and menu.index or 1
+  end
+
+  local function setIndex(menu, index)
+    menu.index = index
+    if menu.modernStartGen2 and menu.list then menu.list.index = index end
   end
 
   local function drawShell(menu, layout)
@@ -427,13 +492,24 @@ return function(mod, icons)
     -- Earpiece and compact status line: play time on the left, page on right.
     fill(panelX + 39, panelY + 3, 26, 3, INK)
     fill(panelX + 42, panelY + 3, 20, 1, LIGHT)
-    local seconds = math.max(0, math.floor(menu.game.save.playTime or 0))
-    local time = ("%d:%02d"):format(math.floor(seconds / 3600),
-      math.floor(seconds / 60) % 60)
+    local playTime = menu.game.save.playTime
+    local hours, minutes
+    if type(playTime) == "table" then
+      -- Gold, Silver and Crystal keep their clock split into fields. Gen 1
+      -- uses a single count of elapsed seconds, so accept both save shapes.
+      hours = math.max(0, math.floor(tonumber(playTime.hours) or 0))
+      minutes = math.max(0, math.floor(tonumber(playTime.minutes) or 0)) % 60
+    else
+      local seconds = math.max(0, math.floor(tonumber(playTime) or 0))
+      hours = math.floor(seconds / 3600)
+      minutes = math.floor(seconds / 60) % 60
+    end
+    local time = ("%d:%02d"):format(hours, minutes)
     drawSmall(time, panelX + 7, panelY + 9, INK)
     local count = #menu.items
     local pages = math.max(1, math.ceil(count / PAGE_SIZE))
-    local page = count > 0 and math.floor((menu.index - 1) / PAGE_SIZE) + 1 or 1
+    local index = currentIndex(menu)
+    local page = count > 0 and math.floor((index - 1) / PAGE_SIZE) + 1 or 1
     local pageText = ("%d/%d"):format(page, pages)
     drawSmall(pageText, panelX + PANEL_W - 7 - smallWidth(pageText),
       panelY + 9, INK)
@@ -447,7 +523,8 @@ return function(mod, icons)
         layout.panelY + 64, PANEL_W - 16, INK)
       return
     end
-    local pageStart = math.floor((menu.index - 1) / PAGE_SIZE) * PAGE_SIZE + 1
+    local index = currentIndex(menu)
+    local pageStart = math.floor((index - 1) / PAGE_SIZE) * PAGE_SIZE + 1
     for slot = 1, PAGE_SIZE do
       local itemIndex = pageStart + slot - 1
       local item = menu.items[itemIndex]
@@ -455,7 +532,7 @@ return function(mod, icons)
       local col, row = (slot - 1) % COLUMNS, math.floor((slot - 1) / COLUMNS)
       local x, y = layout.gridX + col * COL_STEP,
         layout.gridY + row * ROW_STEP
-      local selected = itemIndex == menu.index
+      local selected = itemIndex == index
       if selected then
         fill(x - 1, y - 1, CELL_W + 2, CELL_H + 2, INK)
         fill(x + 1, y + 1, CELL_W - 2, CELL_H - 2, WHITE)
@@ -466,7 +543,6 @@ return function(mod, icons)
       end
       local id = normalizedId(item, menu.game)
       drawIcon(id, x + ICON_OFFSET_X, y + ICON_OFFSET_Y, itemLabel(item))
-      centerSmall(tileLabel(item, id), x + 2, y + 21, CELL_W - 4, INK)
     end
   end
 
@@ -474,7 +550,7 @@ return function(mod, icons)
     local panelX, panelY = layout.panelX, layout.panelY
     fill(panelX + 4, panelY + 118, PANEL_W - 8, 1, INK)
     if #menu.items == 0 then return end
-    local label = itemLabel(menu.items[menu.index])
+    local label = itemLabel(menu.items[currentIndex(menu)])
     local x, y, width = panelX + 8, panelY + 124, PANEL_W - 16
     -- The mini alphabet covers Latin captions. For other scripts, retain the
     -- game's active font/charmap so a localization mod's real glyphs appear
@@ -494,7 +570,7 @@ return function(mod, icons)
       return
     end
     -- Long localized or third-party labels pass through the footer in full;
-    -- tile captions stay compact, but the authoritative label is never lost.
+    -- icon-only tiles stay quiet, but the authoritative label is never lost.
     local gap = 18
     local travel = textWidth + gap
     -- Show the beginning immediately, pause long enough to read it, then
@@ -525,16 +601,22 @@ return function(mod, icons)
   local function move(menu, delta)
     local count = #menu.items
     if count == 0 then return end
-    local index = ((menu.index - 1 + delta) % count) + 1
-    if index ~= menu.index then
-      menu.index = index
+    local current = currentIndex(menu)
+    local index = ((current - 1 + delta) % count) + 1
+    if index ~= current then
+      setIndex(menu, index)
       menu.modernStartElapsed = 0
     end
-    menu.scroll = math.floor((menu.index - 1) / PAGE_SIZE) * PAGE_SIZE
+    menu.scroll = math.floor((index - 1) / PAGE_SIZE) * PAGE_SIZE
   end
 
   local function update(menu, dt)
     menu.modernStartElapsed = (menu.modernStartElapsed or 0) + (dt or 0)
+    if menu.modernStartGen2 and menu.phase == "confirm" then
+      menu.classicStartMenuUpdate(menu, dt)
+      setIndex(menu, menu.list and menu.list.index or currentIndex(menu))
+      return
+    end
     local input = menu.game.input
     if input:wasPressed("left") then
       move(menu, -1)
@@ -545,10 +627,18 @@ return function(mod, icons)
     elseif input:wasPressed("down") then
       move(menu, COLUMNS)
     elseif input:wasPressed("a") and #menu.items > 0 then
-      if not menu.noSound then Sound.play(menu.game.data, "Press_AB") end
-      local item = menu.items[menu.index]
-      if not item.keepOpen then menu.game.stack:pop() end
-      if type(item.onSelect) == "function" then item.onSelect() end
+      local index = currentIndex(menu)
+      local item = menu.items[index]
+      if menu.modernStartGen2 then
+        menu:choose(item and item.value, index)
+      else
+        if not menu.noSound then Sound.play(menu.game.data, "Press_AB") end
+        if not item.keepOpen then menu.game.stack:pop() end
+        if type(item.onSelect) == "function" then item.onSelect() end
+      end
+    elseif menu.modernStartGen2 and (input:wasPressed("b")
+        or input:wasPressed("start")) then
+      menu:close()
     elseif menu.cancelable and (input:wasPressed("b")
         or (menu.startCloses and input:wasPressed("start"))) then
       if input:wasPressed("b") and not menu.noSound then
@@ -557,24 +647,44 @@ return function(mod, icons)
       menu.game.stack:pop()
       if menu.onCancel then menu.onCancel() end
     end
-    if menu.game.save then
+    if menu.game.save and not menu.modernStartGen2 then
       menu.game.save.startMenuIndex = math.max(1, menu.index or 1)
     end
   end
 
+  local function drawConfirm(menu, layout)
+    if not (menu.modernStartGen2 and menu.phase == "confirm") then return end
+    local x, y, width = layout.panelX + 8, layout.panelY + 45,
+      layout.panelW - 16
+    fill(x, y, width, 47, INK)
+    fill(x + 2, y + 2, width - 4, 43, LIGHT)
+    centerSmall("RETURN TO TITLE?", x + 4, y + 7, width - 8, INK)
+    local yes = menu.confirmChoice == 1
+    local noX = x + width - 36
+    fill(x + 8, y + 24, 28, 13, INK)
+    fill(x + 9, y + 25, 26, 11, yes and DARK or LIGHT)
+    fill(noX, y + 24, 28, 13, INK)
+    fill(noX + 1, y + 25, 26, 11, yes and LIGHT or DARK)
+    centerSmall("YES", x + 8, y + 28, 28, yes and WHITE or INK)
+    centerSmall("NO", noX, y + 28, 28, yes and INK or WHITE)
+  end
+
   local function draw(menu)
+    -- Game2 has no variable-width UI canvas.  On a wide Gen 2 window the
+    -- ordinary stack pass is still the centred 160x144 cartridge surface, so
+    -- leave this pass empty; main.lua redraws the same presenter once in the
+    -- window-space HUD pass, docked against the true right edge.
+    if menu.modernStartGen2 and not menu.modernStartHudPass then
+      local pixelWidth, pixelHeight = displayPixels()
+      local logicalWidth = select(1, responsiveSize(menu))
+      if pixelWidth > pixelHeight and logicalWidth > SCREEN_W then return end
+    end
     local renderer = menu.game and menu.game.renderer
     local layout = layoutFor(menu)
-    -- A tall responsive surface covers the physical play area, so its centred
-    -- panel can still dock horizontally against the right edge. Compact
-    -- 144px surfaces—including Faithful Ratio—are already centred by the
-    -- renderer; top-right docking those would discard the vertical letterbox
-    -- position and pin the phone to the physical top of a tall display.
-    if renderer and renderer.setUIAnchor
-        and layout.height >= PORTRAIT_MIN_H then
-      renderer:setUIAnchor(layout.panelX, layout.panelY,
-        PANEL_W, PANEL_H, "topright")
-    end
+    menu.modernStartLastWideWidth = layout.width
+    -- Do not call setUIAnchor here. The renderer owns screen-position modes;
+    -- retaining its existing centred/top/high placement prevents START from
+    -- moving the world or leaving an anchor behind for the SAVE prompt.
     -- Dynamic UI normally follows the overworld's survey zoom. That is a
     -- useful default for classic screen furniture, but it makes this
     -- already-compact panel half-size when a Pocket Taco / controller
@@ -600,6 +710,7 @@ return function(mod, icons)
     drawTiles(menu, layout)
     drawFooter(menu, layout)
     drawSafari(menu, layout)
+    drawConfirm(menu, layout)
     love.graphics.pop()
   end
 
@@ -610,6 +721,8 @@ return function(mod, icons)
     menu.classicStartMenuDraw = menu.draw
     menu.classicStartMenuUISize = menu.uiSize
     menu.classicStartMenuSGBPalettes = menu.sgbPalettes
+    menu.modernStartGen2 = type(menu.list) == "table"
+      and type(menu.choose) == "function" and type(menu.close) == "function"
     menu.modernStartMenuUI = true
     menu.modernStartElapsed = 0
     menu.update = update
@@ -617,7 +730,8 @@ return function(mod, icons)
     menu.uiSize = uiSize
     menu.sgbPalettes = sgbPalettes
     if #menu.items > 0 then
-      menu.index = math.max(1, math.min(menu.index or 1, #menu.items))
+      local initial = menu.modernStartGen2 and menu.list.index or menu.index
+      setIndex(menu, math.max(1, math.min(initial or 1, #menu.items)))
       menu.scroll = math.floor((menu.index - 1) / PAGE_SIZE) * PAGE_SIZE
     else
       menu.index, menu.scroll = 0, 0
@@ -631,12 +745,19 @@ return function(mod, icons)
   Presentation.PANEL_H = PANEL_H
   Presentation.iconOffsetY = ICON_OFFSET_Y
   Presentation.iconFor = normalizedId
+  Presentation.detectedIconFor = detectedId
+  Presentation.entryKeyFor = entryKey
+  Presentation.isCustomItem = isCustomItem
+  Presentation.normalizeText = miniText
   Presentation.tileLabelFor = tileLabel
   Presentation.layoutFor = layoutFor
   Presentation.uiSize = uiSize
   Presentation.sgbPalettes = sgbPalettes
   Presentation.themeFor = selectedTheme
   Presentation.themePalettes = THEME_PALETTES
+  Presentation.draw = draw
+  Presentation.drawIcon = drawIcon
+  Presentation.tileLabels = false
   Presentation.iconAsset = icons.asset
   Presentation.iconPaletteSize = icons.paletteSize
   return Presentation
