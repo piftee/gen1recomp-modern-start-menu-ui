@@ -7,6 +7,7 @@ return {
       "START menu presentation and directional navigation",
       "Stable native viewport positioning across screen modes",
       "Optional saved phone-only colour theme",
+      "Saved horizontal phone placement and header clock source",
       "Icon-only buttons with the selected action named in the footer",
     },
     added = {
@@ -16,6 +17,7 @@ return {
       "Dedicated visual icon selector for third-party actions",
       "Compact Safari status display",
       "MAP, RED, BLUE and DMG palette choices",
+      "Five phone positions and optional local device time",
     },
     known = {
       "Uses engine_internals for the built-in menu controller and renderer",

@@ -158,6 +158,18 @@ return function(mod, presentation, config)
         right = config.themeLabel(),
         kind = "theme",
       },
+      {
+        id = mod.id .. ":position",
+        label = "POSITION",
+        right = config.positionLabel(),
+        kind = "position",
+      },
+      {
+        id = mod.id .. ":clock",
+        label = "CLOCK",
+        right = config.clockLabel(),
+        kind = "clock",
+      },
     }
     for _, key in ipairs(config.customEntryOrder) do
       local entry = config.customEntries[key]
@@ -172,7 +184,7 @@ return function(mod, presentation, config)
         }
       end
     end
-    if #items == 1 then
+    if #items == 3 then
       items[#items + 1] = {
         id = mod.id .. ":none",
         label = "NO MOD ENTRIES",
@@ -213,6 +225,14 @@ return function(mod, presentation, config)
         config.stepTheme(game, 1)
         persist()
         refresh(item.id)
+      elseif item.kind == "position" then
+        config.stepPosition(game, 1)
+        persist()
+        refresh(item.id)
+      elseif item.kind == "clock" then
+        config.stepClock(game, 1)
+        persist()
+        refresh(item.id)
       elseif item.kind == "icon" then
         local picker = Settings.newPicker(game, item.key, item.entry,
           function() refresh(item.id) end)
@@ -230,11 +250,15 @@ return function(mod, presentation, config)
     menu.update = function(self, dt)
       local item = self.items and self.items[self.index]
       local input = self.game and self.game.input
-      if item and item.kind == "theme" and input then
+      if item and (item.kind == "theme" or item.kind == "position"
+          or item.kind == "clock") and input then
+        local step = item.kind == "theme" and config.stepTheme
+          or item.kind == "position" and config.stepPosition
+          or config.stepClock
         if input:wasPressed("left") then
-          config.stepTheme(self.game, -1); persist(); refresh(item.id); return
+          step(self.game, -1); persist(); refresh(item.id); return
         elseif input:wasPressed("right") then
-          config.stepTheme(self.game, 1); persist(); refresh(item.id); return
+          step(self.game, 1); persist(); refresh(item.id); return
         end
       end
       return baseUpdate(self, dt)

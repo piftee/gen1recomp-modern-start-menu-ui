@@ -16,7 +16,7 @@ return function(mod, icons)
   -- fight for the top two-thirds of its cell. With captions removed, keep
   -- the native 16x16 art optically centred in the full 30px button.
   local ICON_OFFSET_X, ICON_OFFSET_Y = 7, 7
-  local iconAtlas, iconQuads, iconLoadFailed
+  local iconAtlas, iconQuads, iconLoadFailed, hudShader
 
   local WHITE, LIGHT, DARK, INK = 1, 0.82, 0.34, 0
   -- Each authored palette keeps paper, accent, body and ink far enough apart
@@ -38,6 +38,11 @@ return function(mod, icons)
     },
   }
   local VALID_THEMES = { map = true, red = true, blue = true, dmg = true }
+  local POSITION_RATIOS = {
+    left = 0, mid_left = 0.25, center = 0.5,
+    mid_right = 0.75, right = 1,
+  }
+  local VALID_CLOCKS = { play = true, device = true }
   local BUILTIN_IDS = {
     pokedex = true, party = true, bag = true, trainer = true, save = true,
     options = true, link = true, mods = true, quit = true,
@@ -360,11 +365,31 @@ return function(mod, icons)
     return SCREEN_W, SCREEN_H
   end
 
+  local function selectedOption(key, valid, fallback)
+    local options = mod and mod.options
+    if not (options and type(options.get) == "function") then return fallback end
+    local ok, value = pcall(options.get, options, key)
+    if ok and valid[value] then return value end
+    return fallback
+  end
+
+  local function selectedTheme()
+    return selectedOption("theme", VALID_THEMES, "map")
+  end
+
+  local function selectedPosition()
+    return selectedOption("position", POSITION_RATIOS, "right")
+  end
+
+  local function selectedClock()
+    return selectedOption("clock", VALID_CLOCKS, "play")
+  end
+
   local function layoutFor(menu)
     local width, height = SCREEN_W, SCREEN_H
-    -- Gen 2's optional final HUD pass is already outside the stack renderer;
-    -- it can use the wide display without mutating the game's UI surface.
-    if menu and menu.modernStartGen2 and menu.modernStartHudPass then
+    -- The optional final HUD pass is already outside the stack renderer; it
+    -- can use the wide display without mutating the game's UI surface.
+    if menu and menu.modernStartHudPass then
       width, height = responsiveSize(menu)
     end
     width = math.max(SCREEN_W, math.floor(width))
@@ -372,7 +397,10 @@ return function(mod, icons)
 
     local availableHeight = height
 
-    local panelX = width - PANEL_MARGIN - PANEL_W
+    local travel = math.max(0, width - PANEL_W - PANEL_MARGIN * 2)
+    local position = selectedPosition()
+    local panelX = PANEL_MARGIN
+      + math.floor(travel * (POSITION_RATIOS[position] or 1) + 0.5)
     local panelY = PANEL_MARGIN
     if height >= PORTRAIT_MIN_H then
       panelY = math.floor((availableHeight - PANEL_H) / 2)
@@ -389,15 +417,8 @@ return function(mod, icons)
       gridX = panelX + 4,
       gridY = panelY + 22,
       availableHeight = availableHeight,
+      position = position,
     }
-  end
-
-  local function selectedTheme()
-    local options = mod and mod.options
-    if not (options and type(options.get) == "function") then return "map" end
-    local ok, value = pcall(options.get, options, "theme")
-    if ok and VALID_THEMES[value] then return value end
-    return "map"
   end
 
   local function applyPanelTheme(zones, layout)
@@ -471,6 +492,66 @@ return function(mod, icons)
     return phoneIsTop and applyPanelTheme(nil, layout) or nil
   end
 
+  local function validPalette(colors)
+    if type(colors) ~= "table" or #colors < 4 then return false end
+    for index = 1, 4 do
+      if type(colors[index]) ~= "table" or #colors[index] < 3 then
+        return false
+      end
+    end
+    return true
+  end
+
+  local function hudPaletteFor(menu)
+    local fixed = THEME_PALETTES[selectedTheme()]
+    if validPalette(fixed) then return fixed end
+
+    -- MAP normally inherits whichever SGB zone covers the panel on the
+    -- cartridge canvas. Resolve that same zone for the window-space redraw,
+    -- preferring later (more specific) rectangles just like Renderer does.
+    local layout = layoutFor(menu)
+    local x, y = layout.panelX + math.floor(layout.panelW / 2),
+      layout.panelY + math.floor(layout.panelH / 2)
+    local zones = sgbPalettes(menu, menu and menu.game)
+    for index = type(zones) == "table" and #zones or 0, 1, -1 do
+      local zone = zones[index]
+      local zx, zy = tonumber(zone.x) or 0, tonumber(zone.y) or 0
+      local zw, zh = tonumber(zone.w) or 0, tonumber(zone.h) or 0
+      if x >= zx and x < zx + zw and y >= zy and y < zy + zh
+          and validPalette(zone.colors) then
+        return zone.colors
+      end
+    end
+    local fallback = PaletteFX and menu and menu.game and menu.game.data
+      and PaletteFX.pal(menu.game.data, "MEWMON") or nil
+    return validPalette(fallback) and fallback
+      or (PaletteFX and PaletteFX.GRAYS or nil)
+  end
+
+  local function applyHudPalette(menu)
+    if not (PaletteFX and type(PaletteFX.sendColors) == "function"
+        and love.graphics and type(love.graphics.newShader) == "function") then
+      return nil
+    end
+    if hudShader == nil then
+      local ok, shader = pcall(love.graphics.newShader, [[
+        extern vec3 c0; extern vec3 c1; extern vec3 c2; extern vec3 c3;
+        vec4 effect(vec4 color, Image tex, vec2 tc, vec2 sc) {
+          vec4 p = Texel(tex, tc) * color;
+          vec3 mapped = p.r > 0.83 ? c0
+            : (p.r > 0.5 ? c1 : (p.r > 0.17 ? c2 : c3));
+          return vec4(mapped, p.a);
+        }
+      ]])
+      hudShader = ok and shader or false
+    end
+    local shader = hudShader or nil
+    local colors = hudPaletteFor(menu)
+    if not (shader and validPalette(colors)) then return nil end
+    PaletteFX.sendColors(shader, colors)
+    return shader
+  end
+
   local function currentIndex(menu)
     if menu and menu.modernStartGen2 and menu.list then
       return menu.list.index or menu.index or 1
@@ -481,6 +562,45 @@ return function(mod, icons)
   local function setIndex(menu, index)
     menu.index = index
     if menu.modernStartGen2 and menu.list then menu.list.index = index end
+    local save = menu.game and menu.game.save
+    if save and index and index > 0 then
+      save.startMenuIndex = math.max(1, math.floor(index))
+    end
+  end
+
+  local function playClockText(menu)
+    local playTime = menu.game.save.playTime
+    local hours, minutes
+    if type(playTime) == "table" then
+      -- Gold, Silver and Crystal keep their play clock split into fields.
+      -- Gen 1 uses a single count of elapsed seconds, so accept both shapes.
+      hours = math.max(0, math.floor(tonumber(playTime.hours) or 0))
+      minutes = math.max(0, math.floor(tonumber(playTime.minutes) or 0)) % 60
+    else
+      local seconds = math.max(0, math.floor(tonumber(playTime) or 0))
+      hours = math.floor(seconds / 3600)
+      minutes = math.floor(seconds / 60) % 60
+    end
+    return ("%d:%02d"):format(hours, minutes)
+  end
+
+  local function clockTextFor(menu, deviceTime)
+    if selectedClock() == "device" then
+      local now = deviceTime
+      if type(now) ~= "table" and os and type(os.date) == "function" then
+        local ok, value = pcall(os.date, "*t")
+        if ok then now = value end
+      end
+      if type(now) == "table" then
+        local hour = tonumber(now.hour or now.hours)
+        local minute = tonumber(now.min or now.minute or now.minutes)
+        if hour and minute then
+          return ("%02d:%02d"):format(math.floor(hour) % 24,
+            math.floor(minute) % 60)
+        end
+      end
+    end
+    return playClockText(menu)
   end
 
   local function drawShell(menu, layout)
@@ -489,22 +609,10 @@ return function(mod, icons)
     fill(panelX + 2, panelY + 1, PANEL_W - 4, PANEL_H - 2, DARK)
     fill(panelX + 4, panelY + 4, PANEL_W - 8, PANEL_H - 8, WHITE)
 
-    -- Earpiece and compact status line: play time on the left, page on right.
+    -- Earpiece and compact status line: selected clock on left, page on right.
     fill(panelX + 39, panelY + 3, 26, 3, INK)
     fill(panelX + 42, panelY + 3, 20, 1, LIGHT)
-    local playTime = menu.game.save.playTime
-    local hours, minutes
-    if type(playTime) == "table" then
-      -- Gold, Silver and Crystal keep their clock split into fields. Gen 1
-      -- uses a single count of elapsed seconds, so accept both save shapes.
-      hours = math.max(0, math.floor(tonumber(playTime.hours) or 0))
-      minutes = math.max(0, math.floor(tonumber(playTime.minutes) or 0)) % 60
-    else
-      local seconds = math.max(0, math.floor(tonumber(playTime) or 0))
-      hours = math.floor(seconds / 3600)
-      minutes = math.floor(seconds / 60) % 60
-    end
-    local time = ("%d:%02d"):format(hours, minutes)
+    local time = clockTextFor(menu)
     drawSmall(time, panelX + 7, panelY + 9, INK)
     local count = #menu.items
     local pages = math.max(1, math.ceil(count / PAGE_SIZE))
@@ -588,14 +696,19 @@ return function(mod, icons)
     if not (game.save.safari and ow and ow.map and ow.inSafariStepZone
         and ow:inSafariStepZone()) then return end
     local safari = game.save.safari
-    fill(0, 0, layout.panelX, 17, INK)
-    fill(1, 1, layout.panelX - 2, 15, WHITE)
+    local statusX, statusW = 0, layout.panelX
+    local rightX = layout.panelX + layout.panelW
+    local rightW = layout.width - rightX
+    if rightW > statusW then statusX, statusW = rightX, rightW end
+    if statusW < 48 then return end
+    fill(statusX, 0, statusW, 17, INK)
+    fill(statusX + 1, 1, statusW - 2, 15, WHITE)
     local steps = math.max(0, math.floor(safari.steps or 0))
     local balls = math.max(0, math.floor(safari.balls or 0))
-    centerSmall(("STEP %d/500"):format(steps), 2, 2,
-      layout.panelX - 4, INK)
-    centerSmall(("BALL %d"):format(balls), 2, 9,
-      layout.panelX - 4, INK)
+    centerSmall(("STEP %d/500"):format(steps), statusX + 2, 2,
+      statusW - 4, INK)
+    centerSmall(("BALL %d"):format(balls), statusX + 2, 9,
+      statusW - 4, INK)
   end
 
   local function move(menu, delta)
@@ -647,9 +760,7 @@ return function(mod, icons)
       menu.game.stack:pop()
       if menu.onCancel then menu.onCancel() end
     end
-    if menu.game.save and not menu.modernStartGen2 then
-      menu.game.save.startMenuIndex = math.max(1, menu.index or 1)
-    end
+    if #menu.items > 0 then setIndex(menu, currentIndex(menu)) end
   end
 
   local function drawConfirm(menu, layout)
@@ -670,18 +781,7 @@ return function(mod, icons)
   end
 
   local function draw(menu)
-    -- Game2 has no variable-width UI canvas.  On a wide Gen 2 window the
-    -- ordinary stack pass is still the centred 160x144 cartridge surface, so
-    -- leave this pass empty; main.lua redraws the same presenter once in the
-    -- window-space HUD pass, docked against the true right edge.
-    if menu.modernStartGen2 and not menu.modernStartHudPass then
-      local pixelWidth, pixelHeight = displayPixels()
-      local logicalWidth = select(1, responsiveSize(menu))
-      if pixelWidth > pixelHeight and logicalWidth > SCREEN_W then return end
-    end
     local renderer = menu.game and menu.game.renderer
-    local layout = layoutFor(menu)
-    menu.modernStartLastWideWidth = layout.width
     -- Do not call setUIAnchor here. The renderer owns screen-position modes;
     -- retaining its existing centred/top/high placement prevents START from
     -- moving the world or leaving an anchor behind for the SAVE prompt.
@@ -692,7 +792,11 @@ return function(mod, icons)
     -- FIT-scale answer while leaving Dynamic UI itself enabled. The wrapper
     -- removes itself before render.compose / render.hud mods run; the map
     -- keeps its own zoom and the phone keeps the middle alignment above.
-    if renderer and renderer.worldActive and renderer.uiCentered ~= true
+    -- The hold is declared during the ordinary stack pass and consumed by
+    -- Renderer:endFrame. Never arm it from the later HUD pass, where it would
+    -- survive into the next frame.
+    if not menu.modernStartHudPass and renderer and renderer.worldActive
+        and renderer.uiCentered ~= true
         and not renderer.modernStartMenuScaleHold
         and type(renderer.uiScale) == "function"
         and type(renderer.fitScale) == "function" then
@@ -705,6 +809,17 @@ return function(mod, icons)
         return readableScale
       end
     end
+    -- Wide desktop layouts keep the ordinary cartridge canvas untouched and
+    -- redraw only the phone after composition. The same branch now serves
+    -- both generations, restoring edge placement without reviving the old
+    -- map/Save bounce caused by changing UI size or anchors.
+    if not menu.modernStartHudPass then
+      local pixelWidth, pixelHeight = displayPixels()
+      local logicalWidth = select(1, responsiveSize(menu))
+      if pixelWidth > pixelHeight and logicalWidth > SCREEN_W then return end
+    end
+    local layout = layoutFor(menu)
+    menu.modernStartLastWideWidth = layout.width
     love.graphics.push("all")
     drawShell(menu, layout)
     drawTiles(menu, layout)
@@ -730,7 +845,10 @@ return function(mod, icons)
     menu.uiSize = uiSize
     menu.sgbPalettes = sgbPalettes
     if #menu.items > 0 then
-      local initial = menu.modernStartGen2 and menu.list.index or menu.index
+      local savedIndex = menu.game and menu.game.save
+        and menu.game.save.startMenuIndex
+      local initial = savedIndex
+        or (menu.modernStartGen2 and menu.list.index or menu.index)
       setIndex(menu, math.max(1, math.min(initial or 1, #menu.items)))
       menu.scroll = math.floor((menu.index - 1) / PAGE_SIZE) * PAGE_SIZE
     else
@@ -751,10 +869,16 @@ return function(mod, icons)
   Presentation.normalizeText = miniText
   Presentation.tileLabelFor = tileLabel
   Presentation.layoutFor = layoutFor
+  Presentation.responsiveSize = responsiveSize
   Presentation.uiSize = uiSize
   Presentation.sgbPalettes = sgbPalettes
   Presentation.themeFor = selectedTheme
+  Presentation.positionFor = selectedPosition
+  Presentation.clockFor = selectedClock
+  Presentation.clockTextFor = clockTextFor
   Presentation.themePalettes = THEME_PALETTES
+  Presentation.hudPaletteFor = hudPaletteFor
+  Presentation.applyHudPalette = applyHudPalette
   Presentation.draw = draw
   Presentation.drawIcon = drawIcon
   Presentation.tileLabels = false

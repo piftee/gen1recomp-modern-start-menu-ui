@@ -31,7 +31,8 @@ Buttons show only their centred 16×16 symbol; the full selected label in the
 footer provides the name without squeezing tiny duplicate text into each tile.
 
 After opening START once, use **Options → Modern Start Menu**. The dedicated
-page contains the phone theme and one row for every third-party START action.
+page contains the phone theme, horizontal position, header clock and one row
+for every third-party START action.
 Selecting an action opens a two-page 4×4 visual grid. Leave it on **Auto** to
 use the entry's ID or label, or choose from 31 explicit native symbols such as
 Dex, PKMN, Bag, Quest, Map, Music, Camera, Trophy, Tools, Mail, Shop, Battle,
@@ -52,13 +53,25 @@ Fixed themes recolour only the phone shell, leaving the visible map unchanged.
 The game's global **Colors** setting still has final say, so forced grayscale,
 inverted and Classic display modes continue to behave consistently.
 
-The panel always uses the renderer's existing native 160×144 UI surface. It
-therefore inherits the player's centred/top/high screen position instead of
-recentring the world when START opens, and the SAVE prompt takes over without
-moving the underlying composition. Faithful Ratio, portrait displays, mobile
-touch/controller overlays and landscape layouts all retain that same surface.
-Survey zoom continues to affect the map, but no longer scales the phone panel
-down with it.
+## Position and clock
+
+**Menu Position** offers Left, Mid-L, Center, Mid-R and Right. Right remains
+the default. On wide desktop displays this moves only the finished phone panel
+across the window; it does not resize or recenter the game canvas. Compact,
+Faithful Ratio and mobile-overlay layouts apply the same preference within
+their native viewport.
+
+**Header Clock** defaults to **Play**, preserving the elapsed play-time display
+used by previous releases. Choose **Device** for the phone or computer's local
+24-hour time.
+
+The panel always leaves the renderer's native 160×144 UI surface unchanged.
+It therefore inherits the player's centred/top/high screen composition
+instead of recentering the world when START opens, and the SAVE prompt takes
+over without moving the underlying game. A wide desktop redraws only the phone
+after that stable frame is composed. Faithful Ratio, portrait displays and
+mobile touch/controller overlays retain the native surface. Survey zoom
+continues to affect the map, but no longer scales the phone panel down with it.
 
 The bundled icons are a native 16×16 one-bit PNG atlas. Thirty-one frames use
 NikoIchu's clean CC0 Pixel Icons directly on their original grid; the Pokémon

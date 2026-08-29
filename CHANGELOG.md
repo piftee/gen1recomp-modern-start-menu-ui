@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.14
+
+- Restored the previously selected tile whenever the phone is closed and
+  reopened, including native Gen 2 and compatible legacy controllers.
+- Added five saved horizontal positions: Left, Mid-L, Center, Mid-R and Right.
+  Wide desktop windows place only the phone in the final display pass, keeping
+  the map, screen-position mode, mobile scaling and Save composition stable.
+- Added a saved header-clock choice between elapsed Play time and the device's
+  local 24-hour time.
+- Recoloured the wide display pass through the active phone/map palette, so
+  MAP, RED, BLUE, DMG and the global Colors mode remain consistent at every
+  placement.
+
 ## 0.1.13
 
 - Prevented fixed phone-theme palette zones from leaking into Save summaries,
