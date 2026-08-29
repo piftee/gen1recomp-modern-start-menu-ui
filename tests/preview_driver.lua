@@ -5,6 +5,8 @@ return function(game)
   local Screens = require("src.ui.Screens")
   local dir = os.getenv("SHOT_DIR") or "/tmp/modern-start-menu-ui"
   local previewTheme = os.getenv("POKEPORT_START_MENU_THEME") or "map"
+  local previewPosition = os.getenv("POKEPORT_START_MENU_POSITION") or "right"
+  local previewClock = os.getenv("POKEPORT_START_MENU_CLOCK") or "play"
   local previewZoom = tonumber(os.getenv("POKEPORT_START_MENU_ZOOM")) or 0
   local previewFaithful = os.getenv("POKEPORT_START_MENU_FAITHFUL") == "1"
 
@@ -19,11 +21,15 @@ return function(game)
   game.save.options.modOptions.modern_start_menu_ui =
     game.save.options.modOptions.modern_start_menu_ui or {}
   game.save.options.modOptions.modern_start_menu_ui.theme = previewTheme
+  game.save.options.modOptions.modern_start_menu_ui.position = previewPosition
+  game.save.options.modOptions.modern_start_menu_ui.clock = previewClock
   if game.mods then
     game.mods.modOptions = game.mods.modOptions or {}
     game.mods.modOptions.modern_start_menu_ui =
       game.mods.modOptions.modern_start_menu_ui or {}
     game.mods.modOptions.modern_start_menu_ui.theme = previewTheme
+    game.mods.modOptions.modern_start_menu_ui.position = previewPosition
+    game.mods.modOptions.modern_start_menu_ui.clock = previewClock
   end
   require("src.render.Zoom").offset = previewZoom
   if os.getenv("POKEPORT_START_MENU_PORTRAIT_PREVIEW") == "1"
@@ -84,6 +90,8 @@ return function(game)
       options = {
         get = function(_, key)
           if key == "theme" then return previewTheme end
+          if key == "position" then return previewPosition end
+          if key == "clock" then return previewClock end
         end,
       },
       assets = {
@@ -111,6 +119,8 @@ return function(game)
   U.log("START fit scale before/after", scaleBeforeMenu,
     game.renderer:fitScale())
   U.log("START menu theme", previewTheme)
+  U.log("START menu position", previewPosition)
+  U.log("START menu clock", previewClock)
   U.log("START menu survey zoom", previewZoom)
   U.log("START menu faithful ratio", previewFaithful and "ON" or "OFF")
   U.log(menu.modernStartMenuUI and "PASS modern START menu is active"

@@ -10,8 +10,21 @@ return function(mod)
         { "MAP", "map" }, { "RED", "red" },
         { "BLUE", "blue" }, { "DMG", "dmg" },
       } },
+    { key = "position", label = "START MENU POSITION", type = "choice",
+      default = "right", choices = {
+        { "LEFT", "left" }, { "MID-L", "mid_left" },
+        { "CENTER", "center" }, { "MID-R", "mid_right" },
+        { "RIGHT", "right" },
+      } },
+    { key = "clock", label = "START MENU CLOCK", type = "choice",
+      default = "play", choices = {
+        { "PLAY", "play" }, { "DEVICE", "device" },
+      } },
   }
   mod.options:define(optionSchema)
+
+  local optionRows = {}
+  for _, row in ipairs(optionSchema) do optionRows[row.key] = row end
 
   local ICON_CHOICES = {
     { "AUTO", "auto" }, { "DEX", "pokedex" }, { "PKMN", "party" },
@@ -32,42 +45,56 @@ return function(mod)
   local customEntries, customEntryOrder = {}, {}
   local presentation
 
-  local function setTheme(game, value)
+  local function setOption(game, key, value)
     local options = game and game.save and game.save.options
     if options then
       options.modOptions = options.modOptions or {}
       options.modOptions[mod.id] = options.modOptions[mod.id] or {}
-      options.modOptions[mod.id].theme = value
+      options.modOptions[mod.id][key] = value
     end
     local loader = game and game.mods
     if loader then
       loader.modOptions = loader.modOptions or {}
       loader.modOptions[mod.id] = loader.modOptions[mod.id] or {}
-      loader.modOptions[mod.id].theme = value
+      loader.modOptions[mod.id][key] = value
       if loader.events then
         loader.events:emit("mod.options_changed",
-          { mod = mod.id, key = "theme", value = value })
+          { mod = mod.id, key = key, value = value })
       end
     end
   end
 
-  local function themeLabel()
-    local current = mod.options:get("theme")
-    for _, choice in ipairs(optionSchema[1].choices) do
+  local function choiceLabel(key)
+    local row = optionRows[key]
+    local current = mod.options:get(key)
+    for _, choice in ipairs(row.choices) do
       if choice[2] == current then return choice[1] end
     end
-    return "MAP"
+    return row.choices[1][1]
   end
 
-  local function stepTheme(game, direction)
-    local choices = optionSchema[1].choices
-    local current, index = mod.options:get("theme"), 1
+  local function stepChoice(game, key, direction)
+    local choices = optionRows[key].choices
+    local current, index = mod.options:get(key), 1
     for i, choice in ipairs(choices) do
       if choice[2] == current then index = i break end
     end
     index = (index - 1 + (direction or 1)) % #choices + 1
-    setTheme(game, choices[index][2])
+    setOption(game, key, choices[index][2])
     return true
+  end
+
+  local function themeLabel() return choiceLabel("theme") end
+  local function positionLabel() return choiceLabel("position") end
+  local function clockLabel() return choiceLabel("clock") end
+  local function stepTheme(game, direction)
+    return stepChoice(game, "theme", direction)
+  end
+  local function stepPosition(game, direction)
+    return stepChoice(game, "position", direction)
+  end
+  local function stepClock(game, direction)
+    return stepChoice(game, "clock", direction)
   end
 
   local function iconTable(game, create)
@@ -180,6 +207,10 @@ return function(mod)
     local ok, value = pcall(makeSettings, mod, presentation, {
       themeLabel = themeLabel,
       stepTheme = stepTheme,
+      positionLabel = positionLabel,
+      stepPosition = stepPosition,
+      clockLabel = clockLabel,
+      stepClock = stepClock,
       customEntries = customEntries,
       customEntryOrder = customEntryOrder,
       iconChoices = ICON_CHOICES,
@@ -221,6 +252,18 @@ return function(mod)
       label = "PHONE THEME",
       value = themeLabel,
       step = stepTheme,
+    }
+    out[#out + 1] = {
+      id = "modern_start_menu_ui_position",
+      label = "POSITION",
+      value = positionLabel,
+      step = stepPosition,
+    }
+    out[#out + 1] = {
+      id = "modern_start_menu_ui_clock",
+      label = "CLOCK",
+      value = clockLabel,
+      step = stepClock,
     }
     for index, key in ipairs(customEntryOrder) do
       local entry = customEntries[key]
@@ -296,30 +339,41 @@ return function(mod)
     decorate(menu, menu.game, "screen.pushed compatibility fallback")
   end, -1000)
 
-  -- Gold/Silver/Crystal draw transparent menus on a fixed 160x144 stack even
-  -- when the overworld itself is wide.  Re-present only this phone in the
-  -- final window-space HUD pass so its right edge is the display's right edge
-  -- and the map remains visible through every unused column.
+  -- Keep the native 160x144 stack stable so opening START cannot recalculate
+  -- the map, screen-position mode or Save overlays. On a genuinely wide
+  -- display, re-present only the phone in the final window-space HUD pass;
+  -- this gives Gen 1 and Gen 2 configurable horizontal placement without
+  -- resizing or anchoring the underlying game surface.
   mod.hooks:wrap("render.hud", function(next, game, viewport)
     local result = next(game, viewport)
     local stack = game and game.stack
     local menu = stack and stack.top and stack:top() or nil
     if not (type(menu) == "table" and menu.modernStartMenuUI
-        and menu.modernStartGen2 and type(viewport) == "table") then
+        and type(viewport) == "table") then
       return result
     end
+    local requestedWidth = presentation.responsiveSize
+      and select(1, presentation.responsiveSize(menu)) or 160
+    if requestedWidth <= 160 then return result end
     local winW = tonumber(viewport.width) or love.graphics.getWidth()
     local winH = tonumber(viewport.height) or love.graphics.getHeight()
-    local scale = math.max(1, math.floor(math.min(winH / 144, winW / 160)))
-    local width = math.max(160, math.min(640, math.floor(winW / scale)))
+    local pixelScale = math.max(1, tonumber(viewport.scale) or 1)
+    local scaleX = pixelScale / math.max(1e-6, tonumber(viewport.dpiX) or 1)
+    local scaleY = pixelScale / math.max(1e-6, tonumber(viewport.dpiY) or 1)
+    local width = math.max(160, math.min(requestedWidth,
+      math.floor(winW / scaleX)))
     menu.modernStartLastWideWidth = width
     if width <= 160 then return result end
-    local ox = math.floor((winW - width * scale) / 2)
-    local oy = math.floor((winH - 144 * scale) / 2)
+    local ox = math.floor((winW - width * scaleX) / 2)
+    local oy = math.floor((winH - 144 * scaleY) / 2)
     love.graphics.push("all")
     love.graphics.translate(ox, oy)
-    love.graphics.scale(scale, scale)
+    love.graphics.scale(scaleX, scaleY)
     menu.modernStartHudPass = true
+    if presentation.applyHudPalette then
+      local shader = presentation.applyHudPalette(menu)
+      if shader then love.graphics.setShader(shader) end
+    end
     presentation.draw(menu)
     menu.modernStartHudPass = nil
     love.graphics.pop()

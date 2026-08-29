@@ -17,13 +17,22 @@ T.eq(#run.errors, 0, "loads clean (" .. tostring(run.errors[1]) .. ")")
 Strings.load(run.data)
 
 local schema = run.loader.optionSchemas.modern_start_menu_ui or {}
-T.eq(#schema, 1, "registers one phone presentation setting")
+T.eq(#schema, 3, "registers theme, placement, and clock settings")
 T.eq(schema[1].key, "theme", "the theme setting has a stable saved key")
 T.eq(schema[1].default, "map",
   "existing installs keep the location-reactive palette")
 T.eq(#schema[1].choices, 4, "four deliberate phone themes are available")
 T.eq(schema[1].choices[4][2], "dmg",
   "the theme list includes the classic DMG treatment")
+T.eq(schema[2].key, "position",
+  "menu placement has a stable saved key")
+T.eq(schema[2].default, "right",
+  "existing installs retain the intended right-edge placement")
+T.eq(#schema[2].choices, 5,
+  "placement offers edge, middle, and centred choices")
+T.eq(schema[3].key, "clock", "the header clock has a stable saved key")
+T.eq(schema[3].default, "play",
+  "existing installs keep play time unless the player opts into device time")
 
 do
   local optionStack = { states = {} }
@@ -62,7 +71,15 @@ do
     "the phone theme is inside the dedicated page")
   T.eq(settingsMenu.items[1].right, "MAP",
     "the dedicated page reports the reactive default")
-  T.eq(settingsMenu.items[2].label, "NO MOD ENTRIES",
+  T.eq(settingsMenu.items[2].label, "POSITION",
+    "horizontal placement is inside the dedicated page")
+  T.eq(settingsMenu.items[2].right, "RIGHT",
+    "the placement page reports the right-edge default")
+  T.eq(settingsMenu.items[3].label, "CLOCK",
+    "clock source is inside the dedicated page")
+  T.eq(settingsMenu.items[3].right, "PLAY",
+    "the clock page reports the compatible play-time default")
+  T.eq(settingsMenu.items[4].label, "NO MOD ENTRIES",
     "the empty page explains that START must discover mod entries")
   settingsMenu.onChoose(settingsMenu.items[1], settingsMenu)
   T.eq(run.loader.modOptions.modern_start_menu_ui.theme, "red",
@@ -70,9 +87,19 @@ do
   T.eq(optionGame.save.options.modOptions.modern_start_menu_ui.theme, "red",
     "the dedicated page persists its theme choice")
   T.eq(optionWrites, 1, "submenu changes are written immediately")
+  settingsMenu.onChoose(settingsMenu.items[2], settingsMenu)
+  T.eq(run.loader.modOptions.modern_start_menu_ui.position, "left",
+    "the dedicated page changes the live menu placement")
+  settingsMenu.onChoose(settingsMenu.items[3], settingsMenu)
+  T.eq(run.loader.modOptions.modern_start_menu_ui.clock, "device",
+    "the dedicated page changes the live header clock")
   for _ = 1, 3 do
     settingsMenu.onChoose(settingsMenu.items[1], settingsMenu)
   end
+  for _ = 1, 4 do
+    settingsMenu.onChoose(settingsMenu.items[2], settingsMenu)
+  end
+  settingsMenu.onChoose(settingsMenu.items[3], settingsMenu)
 end
 
 -- API 2 mobile builds can lack ui.start_menu.presentation while still
@@ -187,6 +214,8 @@ T.eq(stack:top(), nil, "selecting a normal tile closes the menu")
 
 menu = StartMenu.new(game)
 stack:push(menu)
+T.eq(menu.index, 10,
+  "closing and reopening START restores the previously selected tile")
 menu.noSound = true
 press(menu, "start")
 T.eq(stack:top(), nil, "Start closes the phone panel")
@@ -217,6 +246,61 @@ T.check(gen2ClockDrawn,
 game.save.playTime = 13 * 3600 + 7 * 60
 
 local presentation = run.loader.exports.modern_start_menu_ui.presentation
+T.eq(presentation.clockTextFor(menu), "13:07",
+  "the compatible default header still reports elapsed play time")
+run.loader.modOptions.modern_start_menu_ui.clock = "device"
+T.eq(presentation.clockFor(), "device",
+  "the presentation sees the live clock-source preference")
+T.eq(presentation.clockTextFor(menu, { hour = 6, min = 42 }), "06:42",
+  "device time uses the local 24-hour clock with stable padding")
+run.loader.modOptions.modern_start_menu_ui.clock = "play"
+
+T.eq(presentation.positionFor(), "right",
+  "the phone defaults to the requested right-side placement")
+T.eq(presentation.layoutFor(menu).panelX, 52,
+  "right placement keeps the compact phone against its native edge")
+run.loader.modOptions.modern_start_menu_ui.position = "center"
+T.eq(presentation.layoutFor(menu).panelX, 28,
+  "center placement moves only the phone inside the stable surface")
+run.loader.modOptions.modern_start_menu_ui.position = "left"
+T.eq(presentation.layoutFor(menu).panelX, 4,
+  "left placement reaches the opposite native edge")
+run.loader.modOptions.modern_start_menu_ui.position = "right"
+
+do
+  local gen2Save = { playTime = { hours = 1, minutes = 2 },
+    startMenuIndex = 3 }
+  local gen2Game = { data = run.data, save = gen2Save, input = input }
+  local function gen2Controller()
+    local controller = {
+      game = gen2Game,
+      items = {
+        { value = "pokedex", label = "DEX" },
+        { value = "pokemon", label = "PKMN" },
+        { value = "pack", label = "PACK" },
+        { value = "status", label = "PLAYER" },
+      },
+      list = { index = 1 },
+      update = function() end,
+      draw = function() end,
+      choose = function() end,
+      close = function(self) self.closed = true end,
+    }
+    return presentation.decorate(controller, gen2Game)
+  end
+  local gen2Menu = gen2Controller()
+  T.eq(gen2Menu.index, 3,
+    "Gen 2 restores the shared START cursor when the phone opens")
+  press(gen2Menu, "right")
+  T.eq(gen2Menu.index, 4, "Gen 2 grid navigation still moves normally")
+  T.eq(gen2Save.startMenuIndex, 4,
+    "Gen 2 writes the selected phone tile before closing")
+  press(gen2Menu, "b")
+  T.check(gen2Menu.closed, "Gen 2 retains its native close callback")
+  T.eq(gen2Controller().index, 4,
+    "Gen 2 reopens on its previously selected tile")
+end
+
 T.eq(presentation.iconFor({ id = "save", label = "ANYTHING" }), "save",
   "stable ids select built-in icons")
 T.eq(presentation.iconFor({ label = "RED" }, game), "trainer",
@@ -370,6 +454,35 @@ graphics.getPixelDimensions, graphics.getDimensions = oldPixelDimensions,
   oldDimensions
 game.renderer.uiSize = nil
 
+-- Wide desktop placement is a final phone-only pass. Gen 1 previously used
+-- only the centred cartridge pass here, which caused the Windows regression
+-- where the intended right-edge phone drifted toward the middle.
+do
+  local oldWidePixels, oldWideDimensions = graphics.getPixelDimensions,
+    graphics.getDimensions
+  graphics.getPixelDimensions = function() return 1024, 768 end
+  graphics.getDimensions = function() return 1024, 768 end
+  run.loader.modOptions.modern_start_menu_ui.position = "right"
+  run.loader.modOptions.modern_start_menu_ui.theme = "blue"
+  local hudOK, hudError = pcall(Runtime.call, "render.hud",
+    function() end, game, {
+      width = 1024, height = 768, scale = 5, dpiX = 1, dpiY = 1,
+    })
+  T.check(hudOK,
+    "the Gen 1 wide-screen phone pass renders cleanly: " .. tostring(hudError))
+  T.eq(menu.modernStartLastWideWidth, 204,
+    "the wide phone uses the complete crisp desktop width")
+  T.eq(menu.modernStartHudPass, nil,
+    "the final-pass marker never leaks into later screens")
+  menu.modernStartHudPass = true
+  T.eq(presentation.layoutFor(menu).panelX, 96,
+    "right placement docks the phone at the wide display edge")
+  menu.modernStartHudPass = nil
+  run.loader.modOptions.modern_start_menu_ui.theme = "map"
+  graphics.getPixelDimensions, graphics.getDimensions = oldWidePixels,
+    oldWideDimensions
+end
+
 -- Unknown rows discovered through ui.start_menu.items live on the dedicated
 -- page and open a visual 4x4 picker. AUTO keeps label/id detection; every
 -- other value maps directly to a native atlas frame.
@@ -382,8 +495,8 @@ do
     "the main Options list retains one dedicated entry")
   T.check(rows[1].activate(game), "the populated settings page opens")
   local settingsMenu = stack:top()
-  T.eq(#settingsMenu.items, 7,
-    "theme, five discovered mod entries, and Back share one page")
+  T.eq(#settingsMenu.items, 9,
+    "three phone preferences, five discovered entries, and Back share one page")
   local selector
   for _, item in ipairs(settingsMenu.items) do
     if item.key == "label:DEXNAV SUPER LONG LABEL" then selector = item break end
