@@ -17,7 +17,7 @@ return {
       "Dedicated visual icon selector for third-party actions",
       "Compact Safari status display",
       "MAP, RED, BLUE and DMG palette choices",
-      "Five phone positions and optional local device time",
+      "Five phone positions and clearly labelled play or local device time",
     },
     known = {
       "Uses engine_internals for the built-in menu controller and renderer",

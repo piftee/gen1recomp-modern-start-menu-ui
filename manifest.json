@@ -1,7 +1,7 @@
 {
   "id": "modern_start_menu_ui",
   "name": "Modern Start Menu UI",
-  "version": "0.1.14",
+  "version": "0.1.16",
   "github": "piftee/gen1recomp-modern-start-menu-ui",
   "api": 2,
   "games": ["gen1", "gen2"],

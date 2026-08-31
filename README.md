@@ -61,9 +61,10 @@ across the window; it does not resize or recenter the game canvas. Compact,
 Faithful Ratio and mobile-overlay layouts apply the same preference within
 their native viewport.
 
-**Header Clock** defaults to **Play**, preserving the elapsed play-time display
-used by previous releases. Choose **Device** for the phone or computer's local
-24-hour time.
+**Header Clock** defaults to **Play**, showing `PLAY` beside the elapsed
+play-time value. Choose **Device** for the phone or computer's local 24-hour
+time; the header shows the local weekday beside it so the two clock sources
+remain distinct at a glance.
 
 The panel always leaves the renderer's native 160×144 UI surface unchanged.
 It therefore inherits the player's centred/top/high screen composition
@@ -89,6 +90,8 @@ mod uses `ui.start_menu.presentation`. On earlier API 2 mobile builds it falls
 back to the existing `screen.pushed` lifecycle event, after the finished menu
 has been placed on the stack. A total replacement remains compatible when it
 exposes the usual StartMenu controller fields (`items`, `update`, and `draw`).
+Hotkeys not owned by the phone grid are delegated to that source controller,
+including Gen1MenuManager's SELECT shortcut for rearranging menu items.
 Legacy rows labelled with the current player name are recognized as the
 trainer profile; other unknown labels retain their footer name and receive the
 generic menu icon until the player chooses an override. Latin-script accents

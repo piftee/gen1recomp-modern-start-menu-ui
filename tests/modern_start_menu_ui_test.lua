@@ -207,6 +207,16 @@ T.eq(menu.index, 13, "navigation wraps across all pages")
 T.eq(menu.scroll, 9, "the last item displays on the second page")
 T.eq(game.save.startMenuIndex, 13, "the selected tile persists in the save")
 
+local classicUpdate = menu.classicStartMenuUpdate
+local delegatedSelect = 0
+menu.classicStartMenuUpdate = function(_, _)
+  if input:wasPressed("select") then delegatedSelect = delegatedSelect + 1 end
+end
+press(menu, "select")
+T.eq(delegatedSelect, 1,
+  "unhandled SELECT shortcuts reach the decorated source controller")
+menu.classicStartMenuUpdate = classicUpdate
+
 menu.index, menu.scroll, menu.noSound = 10, 9, true
 press(menu, "a")
 T.check(selected, "third-party callback runs unchanged")
@@ -248,11 +258,18 @@ game.save.playTime = 13 * 3600 + 7 * 60
 local presentation = run.loader.exports.modern_start_menu_ui.presentation
 T.eq(presentation.clockTextFor(menu), "13:07",
   "the compatible default header still reports elapsed play time")
+T.eq(presentation.clockLabelFor(menu), "PLAY 13:07",
+  "the elapsed clock identifies itself in the compact phone header")
 run.loader.modOptions.modern_start_menu_ui.clock = "device"
 T.eq(presentation.clockFor(), "device",
   "the presentation sees the live clock-source preference")
 T.eq(presentation.clockTextFor(menu, { hour = 6, min = 42 }), "06:42",
   "device time uses the local 24-hour clock with stable padding")
+T.eq(presentation.clockLabelFor(menu, { hour = 6, min = 42, wday = 1 }),
+  "SUN 06:42",
+  "device time includes the local weekday so it cannot resemble play time")
+T.eq(presentation.clockLabelFor(menu, { hour = 6, min = 42 }), "NOW 06:42",
+  "a compact source label survives device clocks without weekday metadata")
 run.loader.modOptions.modern_start_menu_ui.clock = "play"
 
 T.eq(presentation.positionFor(), "right",
