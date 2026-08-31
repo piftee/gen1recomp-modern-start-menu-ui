@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.16
+
+- Restored controller-specific hotkeys that are not owned by the phone grid.
+  Gen1MenuManager's SELECT shortcut now reaches its item-reordering options
+  instead of being swallowed by the Modern Start Menu presentation.
+
+## 0.1.15
+
+- Labelled elapsed time as `PLAY` in the phone header instead of presenting an
+  ambiguous bare clock value.
+- Device time now includes the local three-letter weekday, with a compact
+  `NOW` fallback on platforms that do not expose weekday metadata.
+
 ## 0.1.14
 
 - Restored the previously selected tile whenever the phone is closed and

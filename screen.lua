@@ -584,13 +584,22 @@ return function(mod, icons)
     return ("%d:%02d"):format(hours, minutes)
   end
 
+  local WEEKDAY_LABELS = {
+    [1] = "SUN", [2] = "MON", [3] = "TUE", [4] = "WED",
+    [5] = "THU", [6] = "FRI", [7] = "SAT",
+  }
+
+  local function resolvedDeviceTime(deviceTime)
+    if type(deviceTime) == "table" then return deviceTime end
+    if os and type(os.date) == "function" then
+      local ok, value = pcall(os.date, "*t")
+      if ok and type(value) == "table" then return value end
+    end
+  end
+
   local function clockTextFor(menu, deviceTime)
     if selectedClock() == "device" then
-      local now = deviceTime
-      if type(now) ~= "table" and os and type(os.date) == "function" then
-        local ok, value = pcall(os.date, "*t")
-        if ok then now = value end
-      end
+      local now = resolvedDeviceTime(deviceTime)
       if type(now) == "table" then
         local hour = tonumber(now.hour or now.hours)
         local minute = tonumber(now.min or now.minute or now.minutes)
@@ -603,6 +612,14 @@ return function(mod, icons)
     return playClockText(menu)
   end
 
+  local function clockLabelFor(menu, deviceTime)
+    local time = clockTextFor(menu, deviceTime)
+    if selectedClock() ~= "device" then return "PLAY " .. time end
+    local now = resolvedDeviceTime(deviceTime)
+    local weekday = now and WEEKDAY_LABELS[tonumber(now.wday)] or nil
+    return (weekday or "NOW") .. " " .. time
+  end
+
   local function drawShell(menu, layout)
     local panelX, panelY = layout.panelX, layout.panelY
     fill(panelX, panelY, PANEL_W, PANEL_H, INK)
@@ -612,7 +629,7 @@ return function(mod, icons)
     -- Earpiece and compact status line: selected clock on left, page on right.
     fill(panelX + 39, panelY + 3, 26, 3, INK)
     fill(panelX + 42, panelY + 3, 20, 1, LIGHT)
-    local time = clockTextFor(menu)
+    local time = clockLabelFor(menu)
     drawSmall(time, panelX + 7, panelY + 9, INK)
     local count = #menu.items
     local pages = math.max(1, math.ceil(count / PAGE_SIZE))
@@ -759,6 +776,12 @@ return function(mod, icons)
       end
       menu.game.stack:pop()
       if menu.onCancel then menu.onCancel() end
+    else
+      -- Preserve controller extensions installed before this presentation.
+      -- Gen1MenuManager, for example, adds a SELECT shortcut that opens its
+      -- item-reordering options. Our grid owns only the buttons above; any
+      -- other hotkey should still reach the finished source controller.
+      menu.classicStartMenuUpdate(menu, dt)
     end
     if #menu.items > 0 then setIndex(menu, currentIndex(menu)) end
   end
@@ -876,6 +899,7 @@ return function(mod, icons)
   Presentation.positionFor = selectedPosition
   Presentation.clockFor = selectedClock
   Presentation.clockTextFor = clockTextFor
+  Presentation.clockLabelFor = clockLabelFor
   Presentation.themePalettes = THEME_PALETTES
   Presentation.hudPaletteFor = hudPaletteFor
   Presentation.applyHudPalette = applyHudPalette
