@@ -1,5 +1,8 @@
 # Modern Start Menu UI
 
+> [!IMPORTANT]
+> **This standalone mod has been superseded by [Modern UI Suite](https://github.com/piftee/gen1recomp-modern-ui-suite).** It remains available for existing installs, but future fixes and features will be maintained in the suite. Disable this standalone mod before enabling the suite; the suite imports its saved settings automatically.
+
 Modern Start Menu UI presents Pokémon Red's START menu as a compact Gen 1
 phone panel. The map remains visible on the left while every available action
 appears in a paged three-by-three icon grid.
