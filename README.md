@@ -79,7 +79,7 @@ continues to affect the map, but no longer scales the phone panel down with it.
 
 The bundled icons are a native 16×16 one-bit PNG atlas. Thirty-one frames use
 NikoIchu's clean CC0 Pixel Icons directly on their original grid; the Pokémon
-party frame is a matching custom Poké Ball. The offline packer changes only
+party frame is a matching generic team symbol. The offline packer changes only
 the source's black/white canvas into opaque ink and transparency. It never
 crops, scales, traces, interpolates or cleans up the source pixels. The active
 display palette recolours that single ink shade alongside the themed panel.
@@ -136,4 +136,4 @@ tools/start_menu_icon_nikoichu/run.sh
 - pret/pokered for the reference behavior of the START menu.
 - NikoIchu for the CC0 [1-bit Pixel Icons](https://nikoichu.itch.io/pixel-icons)
   used by the menu.
-- ishhodaszi for the matching one-bit Poké Ball.
+- ishhodaszi for the original generic team symbol.

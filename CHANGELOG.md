@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.17
+
+- Replace the game-specific Party symbol with an original generic team symbol.
+- Require reviewed asset hashes and licence notices in source and distributions.
+
 ## 0.1.16
 
 - Restored controller-specific hotkeys that are not owned by the phone grid.

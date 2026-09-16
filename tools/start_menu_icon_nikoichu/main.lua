@@ -3,7 +3,7 @@
 -- is no crop, scale, trace, interpolation, cleanup pass, or palette guess.
 -- The only conversion turns the source's white marks into opaque black ink
 -- and its black canvas into transparency. The party frame is a deliberately
--- authored one-bit Poké Ball on the same grid.
+-- authored generic team symbol on the same grid.
 
 local ICONS = {
   "pokedex", "party", "bag", "trainer", "save", "options",
@@ -49,21 +49,21 @@ local NIKO_SOURCE = {
 
 local PARTY = {
   "................",
+  "................",
+  "......####......",
+  "......####......",
+  "......####......",
+  "..##........##..",
+  "..##..####..##..",
   ".....######.....",
-  "...##......##...",
-  "..#..........#..",
-  ".#............#.",
-  ".#............#.",
-  "#..............#",
-  "######.##.######",
-  "#.....#..#.....#",
-  "######.##.######",
-  "#..............#",
-  ".#............#.",
-  ".#............#.",
-  "..#..........#..",
-  "...##......##...",
-  ".....######.....",
+  ".###.######.###.",
+  "####.######.####",
+  "####.######.####",
+  "####..####..####",
+  "####..####..####",
+  "................",
+  "................",
+  "................",
 }
 
 local SIZE = 16
@@ -162,7 +162,7 @@ function love.load()
   local sourceDir = join(root, "art/modern_start_menu_ui/nikoichu/source")
   local nativeDir = join(root, "art/modern_start_menu_ui/nikoichu/native")
   local atlasPath = join(root,
-    "mods/modern_start_menu_ui/assets/start_menu_icons.png")
+    "assets/start_menu_icons.png")
   local atlas = love.image.newImageData(#ICONS * SIZE, SIZE)
 
   for index, id in ipairs(ICONS) do

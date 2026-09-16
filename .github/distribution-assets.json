@@ -1,0 +1,389 @@
+{
+  "version": 1,
+  "assets": {
+    "art/modern_start_menu_ui/nikoichu/native/auto.png": {
+      "sha256": "8a216000ea58bab899ce6f191f764beaefa0183bc2f8e5470c7dba1a9a992dea",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/bag.png": {
+      "sha256": "48d47cfba1e3e0c3f9657e160046d7f8bb051411f54d83f01503398f56352942",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/battle.png": {
+      "sha256": "69a1f51005451736547c9436753e486795c3662dbf560c52e1e13fc7f265dd78",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/bicycle.png": {
+      "sha256": "c3a138aa8a61f4ff02831f6e9b585b91153f6e320200c02a3494d98cb53a1622",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/camera.png": {
+      "sha256": "76ee531950f73116ed38805ecab6152e180405296eca31ed83fe9a4584013ce0",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/chat.png": {
+      "sha256": "5a97ec714a63fe864ded6af17f2eb311579a52336dabfe1f16cda937343e4c1a",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/chest.png": {
+      "sha256": "e1e6357b538dcd6db3cbcc25d3f9f21394f552b82a1b1988a33d34828d343eaa",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/clock.png": {
+      "sha256": "7f7e5c9472d01e5fc3bf938676285b064c285b4856ecee0ffb29ab723e9e61ae",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/craft.png": {
+      "sha256": "1fc471c0c829e3163f6bd5821eb61d38df3260e4bf9dfafc33c221a92bb8ed41",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/generic.png": {
+      "sha256": "db4b0cbfde620298cb45e36d2ffb0c49f8a4a42905fc8439949fa087a8362e0d",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/heart.png": {
+      "sha256": "25475f997b2cfc6d415772134983b00f903ef4d64389b393b40af07df9d4692d",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/home.png": {
+      "sha256": "582a0c1a8113aecc6e1f74ace907e22256ddbaf8affcf31886bfda1089e09f68",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/key.png": {
+      "sha256": "0bb98a0353ba255593458ff58aa35d4f14b2fa03ac1a238bdb7694dd47752cc7",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/link.png": {
+      "sha256": "de78e07edc095bb07a7a85f4463bd1063ec3f0cba2ae3b01bb96ef0bdf754682",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/mail.png": {
+      "sha256": "6fe35fd447e0db5e0c62c104d11ae6891d6b4e2e209023381b83898cc176a2c7",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/map.png": {
+      "sha256": "5c328e3632e065a806876678de2dd8692c5b4c687c314b06e76ad680439c279a",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/mods.png": {
+      "sha256": "2820684ae31b1e5f21f9655a1e762dc1b7c58d87b1398098d73ea331531aad50",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/music.png": {
+      "sha256": "563033d7721869bcb995f0c66875bbb67ffc96869f7e9cc20547671bdc40b173",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/options.png": {
+      "sha256": "79e9c301efd06362e9889657a1f3282f734ea76b621adf4710d822be51807f0f",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/party.png": {
+      "sha256": "c9bed6c2f8089b5903112908c44acf69a7fbd62d0e69719a0b8ef1faece33a1f",
+      "license": "MIT",
+      "source": "Original project drawing; see icon generator",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/pokedex.png": {
+      "sha256": "710855c631092991e88d450e4bf0a2e4e85556970ca50326da4fa178c961b49d",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/pokegear.png": {
+      "sha256": "f185b3a1f0d1ec3ae4356eb7076ec2cb36ba8a1d876f0b96c94fb887a54197a6",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/potion.png": {
+      "sha256": "b7c6609a0c1ce2efb445e728795c7daad3ccae6f5d122c6bd5996bab836e3dc3",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/quest.png": {
+      "sha256": "4a99b7a5f263bfc314f7f00cdc73af26eb1e8e5b9ea14068541cc758c2348a8c",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/quit.png": {
+      "sha256": "7efe842f9f924a0e7232db6bb17c4640a50ae42e778e6df23a570802bac317a4",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/save.png": {
+      "sha256": "14afef81bd8bc1f1670baff2813303e4a424581ced98bed313678b7587174391",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/search.png": {
+      "sha256": "d242e2b9e453a79015c450fce324cf6a6aff75d9e012c817cee304849aa6af76",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/shop.png": {
+      "sha256": "b7580c53a8dd2bbdc705952225c4a488ca0173fdc7ffb37f3fe2a23cc241ae16",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/star.png": {
+      "sha256": "0a8a9c46b4ca2527707bb99b804a658c06458663b7b1272ac22823deeaf59c15",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/tools.png": {
+      "sha256": "1668051707bf51473bd67382dc69fc0bca077ff5e7f5319b9584d683d7fc35bb",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/trainer.png": {
+      "sha256": "0af8ceccc8bb1b56138d1ee518b5ccf50f2b21767d09fa0c894f148507a4fc5d",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/native/trophy.png": {
+      "sha256": "b5f16be388ccf0768e94ac8b3b98d804c8289daf46b14334ff7899f0501040d3",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/auto.png": {
+      "sha256": "eabf90f5397599d1ccd36e5f58df157f33da07246ba16395b61817c8aa0a2a5d",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/bag.png": {
+      "sha256": "343693209f61edc92cebd96756f8869b0a8b05c7f42cfef8e79e9638b599ea4b",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/battle.png": {
+      "sha256": "da5e3e8e4c4cb42f2e612c65a184d06a1d182515d1953061a9f0938b8d213dad",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/bicycle.png": {
+      "sha256": "ad691c4e6141646159d83d130ec990ede9297c2ebefc1676801d42e5f8a1e075",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/camera.png": {
+      "sha256": "aa1df651c2825e01b7eecf47dae3d1785afc91b001e8161b10743a0ec6065ffa",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/chat.png": {
+      "sha256": "5b13ec664f470342f2f6b4064d1267b9a47d815aeec9964eb1aff47b1043039c",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/chest.png": {
+      "sha256": "83f159e205a187882b4f5706ee0177bb21083bef31364fd65970cb59c665807e",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/clock.png": {
+      "sha256": "f274beacd79931319dcf82a092e98bbd2ddbbfef728ab014f15d4704ea42ff3a",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/craft.png": {
+      "sha256": "0e73d821efd78eadfff7f0d691441aefce11e5444f7e1aff1062331214527743",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/generic.png": {
+      "sha256": "e78bf56f05b49c8092577e81f09a4d8f32dfa369d332d773cdff2d4e644d4405",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/heart.png": {
+      "sha256": "27a31a2f3b48d1824101c7b77fbfb2186526c845eab67c72c7986990908acd7f",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/home.png": {
+      "sha256": "1228ce4b0d13a259951f0a7e9ac5c639a1f09b508588e2799639935687b00371",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/key.png": {
+      "sha256": "9e19e6ca775cb33bb4271fb16b9047d7138e608e34e8f255bca288f3faa5abd5",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/link.png": {
+      "sha256": "039febc64ad305e5efd8a6254a27e0e8725637a0ce249782a615e2e51f746e91",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/mail.png": {
+      "sha256": "6b9f876318e6af5eddf62ebd4c5552eb1617e000ed77d8aabbe6b149444c6ba0",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/map.png": {
+      "sha256": "9852232c943c16190c11430b90d2ff87adf568b01ce38c5db8bbf5a72cdd167e",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/mods.png": {
+      "sha256": "af721bb279a1a25c161a71539668b4605e737f750e524a4ada84b7267ac6b8a2",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/music.png": {
+      "sha256": "cb44985fd77953d13c05e0fa044b06613e8d7da6f2656fe94b7e2602a9dd0467",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/options.png": {
+      "sha256": "cb4b0e10ed84b2f90b2a1f507c60bb1e3c73ad0b4bb597dadea7c60d4ab9982a",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/pokedex.png": {
+      "sha256": "3089bdc1f0862616a13316edd0a5ecd2c493e9f0ba0a297c19b22d308bf93816",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/pokegear.png": {
+      "sha256": "1724aedd33c6cc75efeaa2b89a8af50ca87a8d64f994fa1080a34ea9e7d08763",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/potion.png": {
+      "sha256": "09b20080356444f2c3fcb2f65787f09ea5eacd17e95d3c28b6278ad41ec60be3",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/quest.png": {
+      "sha256": "d5ed13daf6cefbcfb320555f940c2fef156059f4c48b7e8d06977af2629743a5",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/quit.png": {
+      "sha256": "08b1c99c4afef18397cf6d235b0c9476b54bd30c680ae0cb8592ec531ae31284",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/save.png": {
+      "sha256": "9e27cc7d6b0397699ccd3e63f812328af8ae9bd6b75ddc6de1021b3f05c24e99",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/search.png": {
+      "sha256": "5a4fcf15b193eabdfab6c5c2ea1f9c66dc80f849404ddfa0c3b77d799d430443",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/shop.png": {
+      "sha256": "c0887e595bbf25f517985017b45aadf343982b1da6fc53a4cf4484a642e5db11",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/star.png": {
+      "sha256": "76a8d0609dd755b41a440f144c43b475ded5dbb5d61d93da46448eff0f719174",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/tools.png": {
+      "sha256": "2111e2023c6807da88b4099e15e17fe612b23b26dd5f125e279481e713d07511",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/trainer.png": {
+      "sha256": "c6cd1dc0181b1847702da5956b9c5a7b37285678eb813101921b5c8eb9bcaad3",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "art/modern_start_menu_ui/nikoichu/source/trophy.png": {
+      "sha256": "f00b1d13923632980fda550745fb36583258c140003729450c958a82805ac1ca",
+      "license": "CC0-1.0",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    },
+    "assets/start_menu_icons.png": {
+      "sha256": "d2382dad3b896b85bb26d80eeea91f9686c60229672583c4fb1e4f2089f871ac",
+      "license": "CC0-1.0 + MIT (original generic team symbol)",
+      "source": "https://nikoichu.itch.io/pixel-icons",
+      "notice": "THIRD_PARTY_NOTICES.md"
+    }
+  }
+}

@@ -12,5 +12,5 @@ public-domain dedication. The selected source coordinates are preserved
 exactly; packaging changes only the black/white canvas into transparent
 one-colour game sprites.
 
-The Pokémon party Poké Ball is original artwork made for this mod and is not
+The generic three-person Party symbol is original artwork made for this mod and is not
 part of NikoIchu's collection.
